@@ -1,0 +1,77 @@
+#en_US
+#This is the Main language configuration file
+#
+#If you want to color code the text then I recommend you visit http://www.minecraftwiki.net/wiki/Formatting_codes#Color_codes
+#To create the § symbol which is used for assigning a color to the following text press Alt + 21 on Windows. For other OSes, view the above link.
+#This file needs to be UTF-8 encoded to work with MC 1.7+
+
+# Formatting codes
+# Code	Name
+# §0	black
+# §1	dark_blue
+# §2	dark_green
+# §3	dark_aqua
+# §4	dark_red
+# §5	dark_purple	
+# §6	gold
+# §7	gray
+# §8	dark_gray
+# §9	blue
+# §a	green
+# §b	aqua
+# §c	red
+# §d	light_purple
+# §e	yellow
+# §f	white
+
+# §k	Obfuscated
+# §l	Bold
+# §m	Strikethrough
+# §n	Underline
+# §o	Italic
+# §r	Reset
+
+
+#==========
+#= Config =
+#==========
+
+#== Trader ==
+config.trader=Trader
+config.trader.tooltip=Trader settings
+
+config.trader.trades=Trades
+config.trader.trades.tooltip=The list of trade items to include with the trader. Each trade item = 1 emerald.
+config.trader.tradesperday=Trades Per Day
+config.trader.tradesperday.tooltip=The number of trades that can be made for each item per day. Minimum is 1 and Maximum is 99999.
+config.trader.checksvillagesize=Checks Village Size
+config.trader.checksvillagesize.tooltip=If enabled, when trying to spawn a trader it will check the size of the village. The more villagers the less often the trader will spawn.
+
+
+#============
+#= Commands =
+#============
+commands.trader.usage=/trader
+commands.trader.spawn.usage=/trader spawn
+commands.trader.spawn.success=§aTrader has appeared at %s
+commands.trader.spawn.failed=§cTrader spawn failed
+commands.trader.spawn.badconditions=§cTrader spawn failed...spawn conditions not valid
+commands.trader.spawn.exists=§eTrader spawn failed...Trader already located in the village
+commands.trader.spawn.noposition=§cTrader spawn failed...no spawn position found
+commands.trader.spawn.novillage=§cTrader spawn failed...no village found
+
+#=================
+#= Chat Messages =
+#=================
+
+message.trader.exists=§eTrader already located in the village
+message.trader.noposition=§cCould not find a spawn location for the Trader
+message.trader.spawned=§aTrader has appeared at %s
+
+
+#============
+#= Entities =
+#============
+
+entity.trader.name=Trader
+entity.trader.information=§bThe Trader is a vendor that wanders into your village. A player can trade with them to buy emeralds in exchange for specific items.
