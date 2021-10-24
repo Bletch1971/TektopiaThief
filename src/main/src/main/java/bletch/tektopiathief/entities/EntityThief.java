@@ -5,7 +5,6 @@ import java.util.Set;
 import com.leviathanstudio.craftstudio.client.animation.ClientAnimationHandler;
 import com.leviathanstudio.craftstudio.common.animation.AnimationHandler;
 
-import bletch.common.utils.TextUtils;
 import bletch.tektopiathief.core.ModConfig;
 import bletch.tektopiathief.core.ModDetails;
 import bletch.tektopiathief.core.ModEntities;
@@ -20,6 +19,7 @@ import bletch.tektopiathief.storage.ItemDesireSet;
 import bletch.tektopiathief.storage.ModInventory;
 import bletch.tektopiathief.entities.ai.EntityAIUseDoor;
 import bletch.tektopiathief.utils.LoggerUtils;
+import bletch.tektopiathief.utils.TextUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.SharedMonsterAttributes;
