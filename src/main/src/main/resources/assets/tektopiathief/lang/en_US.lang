@@ -36,42 +36,64 @@
 #= Config =
 #==========
 
-#== Trader ==
-config.trader=Trader
-config.trader.tooltip=Trader settings
+#== Debug ==
+config.debug=Debug
+config.debug.tooltip=Debug settings
 
-config.trader.trades=Trades
-config.trader.trades.tooltip=The list of trade items to include with the trader. Each trade item = 1 emerald.
-config.trader.tradesperday=Trades Per Day
-config.trader.tradesperday.tooltip=The number of trades that can be made for each item per day. Minimum is 1 and Maximum is 99999.
-config.trader.checksvillagesize=Checks Village Size
-config.trader.checksvillagesize.tooltip=If enabled, when trying to spawn a trader it will check the size of the village. The more villagers the less often the trader will spawn.
+config.debug.enableDebug=Enable Debug
+config.debug.enableDebug.tooltip=If true, debug information will be output to the console.
+
+#== Thief ==
+config.thief=Thief
+config.thief.tooltip=Thief settings
+
+config.thief.checksvillagesize=Checks Village Size
+config.thief.checksvillagesize.tooltip=If enabled, when trying to spawn a thief it will check the size of the village. The more villagers the more often the thief will spawn.
+config.thief.thiefspawnswhenpeaceful=Thief Spawns on Peaceful Difficulty
+config.thief.thiefspawnswhenpeaceful.tooltop=If enabled, the Thief will spawn even if the difficulty is set to Peaceful.
 
 
 #============
 #= Commands =
 #============
-commands.trader.usage=/trader
-commands.trader.spawn.usage=/trader spawn
-commands.trader.spawn.success=§aTrader has appeared at %s
-commands.trader.spawn.failed=§cTrader spawn failed
-commands.trader.spawn.badconditions=§cTrader spawn failed...spawn conditions not valid
-commands.trader.spawn.exists=§eTrader spawn failed...Trader already located in the village
-commands.trader.spawn.noposition=§cTrader spawn failed...no spawn position found
-commands.trader.spawn.novillage=§cTrader spawn failed...no village found
+commands.thief.usage=/thief
+
+commands.thief.spawn.usage=/thief spawn <level> [me]
+commands.thief.spawn.success=§aThief (level %s) has appeared at %s
+commands.thief.spawn.failed=§cThief spawn failed
+commands.thief.spawn.badconditions=§cThief spawn failed...spawn conditions not valid
+commands.thief.spawn.exists=§eThief spawn failed...Thief already located in the village
+commands.thief.spawn.noposition=§cThief spawn failed...no spawn position found
+commands.thief.spawn.novillage=§cThief spawn failed...no village found
+commands.thief.spawn.peaceful=§cThief spawn failed...difficulty set to Peaceful
+
+commands.thief.kill.usage=/thief kill
+commands.thief.kill.novillage=§cThief kill failed...no village found
+commands.thief.kill.noexists=§eThief kill failed...Thief not located in the village
+commands.thief.kill.success=§aThief has been killed
 
 #=================
 #= Chat Messages =
 #=================
 
-message.trader.exists=§eTrader already located in the village
-message.trader.noposition=§cCould not find a spawn location for the Trader
-message.trader.spawned=§aTrader has appeared at %s
+message.thief.exists=§cThief already located in village %s
+message.thief.noposition.village=§cCould not find a spawn location for the Thief in village %s
+message.thief.spawned.village=§aThief has appeared in village %s at %s
+message.thief.villagecheckfailed=§cThief village check failed, village  %s; size %s; check value %s
+message.thief.villagechecksuccess=§cThief village check success, village  %s; size %s; check value %s
+message.thief.spawnblocked=§cThief spawn blocked by storage marker rotation in village %s
+message.thief.peaceful=§cThief spawn schedule skipped, difficulty set to Peaceful
 
+message.thief.seen=§6A Thief has been spotted in the village
+message.thief.escaped=§6A Thief has escaped the village with %s
+message.thief.killed=§dThe Thief has been killed
+message.thief.killedby=by %s
+message.thief.damage=§dThe Thief has taken %s damage
+message.thief.damagefrom=from %s
 
 #============
 #= Entities =
 #============
 
-entity.trader.name=Trader
-entity.trader.information=§bThe Trader is a vendor that wanders into your village. A player can trade with them to buy emeralds in exchange for specific items.
+entity.thief.name=Thief
+entity.thief.information=§bThe Thief is a passive enemy that wanders into your village. The thief will try to steal items from your storage.

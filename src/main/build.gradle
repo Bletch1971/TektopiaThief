@@ -27,9 +27,14 @@ minecraft {
 }
 
 repositories {
+    maven {
+        name = "leviathan"
+        url = "https://repo.leviathan-studio.com/leviathan/"
+    }
 }
 
 dependencies {
+	deobfCompile "com.leviathanstudio:CraftStudioAPI:${project.craftstudio_version}-mc1.12-alpha:dev"
 }
 
 processResources {
