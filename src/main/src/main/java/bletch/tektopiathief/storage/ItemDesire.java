@@ -10,35 +10,32 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityChest;
 
 public class ItemDesire {
+	private String debugName;
 	protected boolean selfDirty;
 	protected boolean storageDirty;
 	protected int idealCount;
-	protected int requiredCount;
-	protected int limitCount;
 	protected int currentlyHave;
 	protected Function<ItemStack, Integer> neededItemFunction;
 	protected Predicate<EntityThief> shouldNeed;
-	private String debugName;
 	protected TileEntityChest pickUpChest;
 
-	public ItemDesire(Block block, int required, int ideal, int limit, Predicate<EntityThief> shouldNeed) {
-		this(Item.getItemFromBlock(block), required, ideal, limit, shouldNeed);
+	public ItemDesire(Block block, int ideal, Predicate<EntityThief> shouldNeed) {
+		this(Item.getItemFromBlock(block), ideal, shouldNeed);
 	}
 
-	public ItemDesire(Item item, int required, int ideal, int limit, Predicate<EntityThief> shouldNeed) {
-		this(item.getUnlocalizedName(), p -> (p.getItem() == item) ? 1 : -1, required, ideal, limit, shouldNeed);
+	public ItemDesire(Item item, int ideal, Predicate<EntityThief> shouldNeed) {
+		this(item.getUnlocalizedName(), p -> (p.getItem() == item) ? 1 : -1, ideal, shouldNeed);
 	}
 
-	public ItemDesire(String name, Function<ItemStack, Integer> itemFunction, int required, int ideal, int limit, Predicate<EntityThief> should) {
+	public ItemDesire(String name, Function<ItemStack, Integer> itemFunction, int ideal, Predicate<EntityThief> should) {
+		this.debugName = name;
 		this.selfDirty = true;
 		this.storageDirty = true;
-		this.neededItemFunction = itemFunction;
-		this.idealCount = Math.max(ideal, required);
-		this.limitCount = Math.max(this.idealCount, limit);
-		this.requiredCount = required;
-		this.shouldNeed = should;
+		this.idealCount = ideal;
 		this.currentlyHave = 0;
-		this.debugName = name;
+		this.neededItemFunction = itemFunction;
+		this.shouldNeed = should;
+		this.pickUpChest = null;
 	}
 
 	public void forceUpdate() {
@@ -91,8 +88,8 @@ public class ItemDesire {
 			int bestSlot = 0;
 			int bestScore = 0;
 			
-			for (int d = 0; d < chest.getSizeInventory(); ++d) {
-				ItemStack chestStack = chest.getStackInSlot(d);
+			for (int slot = 0; slot < chest.getSizeInventory(); ++slot) {
+				ItemStack chestStack = chest.getStackInSlot(slot);
 				
 				if (!chestStack.isEmpty()) {
 					int thisScore = this.getStoragePickUpFunction().apply(chestStack);
@@ -100,7 +97,7 @@ public class ItemDesire {
 					if (thisScore > bestScore) {
 						bestItem = chestStack;
 						bestScore = thisScore;
-						bestSlot = d;
+						bestSlot = slot;
 					}
 				}
 			}
@@ -129,10 +126,6 @@ public class ItemDesire {
 			
 			if (this.currentlyHave < this.idealCount && this.pickUpChest != null) {
 				if (entity.isStoragePriority()) {
-					return true;
-				}
-				
-				if (this.currentlyHave < this.requiredCount) {
 					return true;
 				}
 			}

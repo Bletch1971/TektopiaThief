@@ -1,8 +1,10 @@
 package bletch.tektopiathief.storage;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import bletch.tektopiathief.entities.EntityThief;
+import bletch.tektopiathief.utils.LoggerUtils;
 import net.minecraft.item.ItemStack;
 
 public class ItemDesireSet {
@@ -45,11 +47,18 @@ public class ItemDesireSet {
     }
     
     public ItemDesire getNeededDesire(EntityThief entity) {
+		LoggerUtils.info("ItemDesireSet - getNeededDesire called", true);
+		
+    	Collections.shuffle(this.itemDesires, entity.getRNG());
+    	
         for (ItemDesire desire : this.itemDesires) {
             if (desire.shouldPickUp(entity)) {
+        		LoggerUtils.info("ItemDesireSet - getNeededDesire exiting, desire found: " + desire.getName(), true);
                 return desire;
             }
         }
+        
+		LoggerUtils.info("ItemDesireSet - getNeededDesire exiting, no desire found.", true);
         return null;
     }
     

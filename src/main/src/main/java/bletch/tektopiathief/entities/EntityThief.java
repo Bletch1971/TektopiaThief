@@ -26,6 +26,7 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.ai.EntityAISwimming;
 import net.minecraft.entity.monster.IMob;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -426,40 +427,73 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
 	protected void setupDesires() {
         this.desireSet = new ItemDesireSet();
         
-//		Function<ItemStack, Integer> bestFood = (Function<ItemStack, Integer>)(p -> EntityAIEatFood.getFoodScore(p.getItem(), this));
-//        this.getDesireSet().addItemDesire(new UpgradeItemDesire("Food", bestFood, 1, 3, 4, p -> p.isHungry() || p.isStoragePriority()));
-
-        this.getDesireSet().addItemDesire(new ItemDesire(Items.POTATO, 1, 5, 12, null));
-        this.getDesireSet().addItemDesire(new ItemDesire(Items.CARROT, 1, 5, 12, null));
-        this.getDesireSet().addItemDesire(new ItemDesire(Items.WHEAT, 0, 0, 12, null));
-        this.getDesireSet().addItemDesire(new ItemDesire(Items.BEETROOT, 0, 0, 12, null));
-//        this.getDesireSet().addItemDesire(new UpgradeItemDesire("Hoe", getBestHoe(), 1, 1, 1, p -> p.isWorkTime()));
-
-//        this.getDesireSet().addItemDesire(new ItemDesire(Items.SHEARS, 1, 1, 1, null));
-//        this.getDesireSet().addItemDesire(new ItemDesire(Items.BUCKET, 1, 2, 2, null));
-//        this.getDesireSet().addItemDesire(new ItemDesire(Items.BOOK, 0, 6, 9, null));
-
-//        this.getDesireSet().addItemDesire(new ItemDesire(Blocks.LOG, 0, 3, 10, null));
-//        this.getDesireSet().addItemDesire(new UpgradeItemDesire("Pick", getBestPick(this), 1, 1, 1, p -> p.isWorkTime()));
-//        this.getDesireSet().addItemDesire(new ItemDesire(Items.DIAMOND, 0, 0, 5, null));
-//        this.getDesireSet().addItemDesire(new ItemDesire(Blocks.IRON_ORE, 0, 0, 8, null));
-//        this.getDesireSet().addItemDesire(new ItemDesire(Blocks.GOLD_ORE, 0, 0, 8, null));
-//        this.getDesireSet().addItemDesire(new ItemDesire(Items.REDSTONE, 0, 0, 16, null));
+        // CROPS
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.BEETROOT, 5, e -> e.isMale())); 
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.CARROT, 5, e -> !e.isMale()));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.POTATO, 5, null));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.WHEAT, 5, e -> e.getLevel() < 3));
         
-//        Predicate<ItemStack> isLapis = p -> p.getItem() == Items.DYE && p.getItemDamage() == EnumDyeColor.BLUE.getDyeDamage();
-//        this.getDesireSet().addItemDesire(new ItemDesire("Lapis", isLapis, 0, 0, 16, null));
-
-//        this.getDesireSet().addItemDesire(new UpgradeItemDesire("Axe", getBestAxe(this), 1, 1, 1, p -> p.isWorkTime()));
-
-//        this.getDesireSet().addItemDesire(new ItemDesire(Items.GOLDEN_APPLE, 1, 1, 1, null));
-        //        this.getDesireSet().addItemDesire(new UpgradeEquipment("Weapon", getBestWeapon(this), EntityEquipmentSlot.MAINHAND, null));
-        //        this.getDesireSet().addItemDesire(new UpgradeEquipment("ArmorFeet", getBestArmor(this, EntityEquipmentSlot.FEET), EntityEquipmentSlot.FEET, null));
-        //        this.getDesireSet().addItemDesire(new UpgradeEquipment("ArmorHead", getBestArmor(this, EntityEquipmentSlot.HEAD), EntityEquipmentSlot.HEAD, null));
-        //        this.getDesireSet().addItemDesire(new UpgradeEquipment("ArmorChest", getBestArmor(this, EntityEquipmentSlot.CHEST), EntityEquipmentSlot.CHEST, null));
-        //        this.getDesireSet().addItemDesire(new UpgradeEquipment("ArmorLegs", getBestArmor(this, EntityEquipmentSlot.LEGS), EntityEquipmentSlot.LEGS, null));
+        // FOOD
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.APPLE, 3, null));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.BAKED_POTATO, 2, e -> e.getLevel() > 1));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.BEEF, 1, e -> e.isMale()));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.BEETROOT_SOUP, 1, e -> e.getLevel() > 2));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.BREAD, 1, null));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.CAKE, 1, e -> e.getLevel() > 3));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.CHICKEN, 1, e -> !e.isMale()));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.COOKED_BEEF, 1, e -> e.getLevel() > 1 && e.isMale()));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.COOKED_CHICKEN, 1, e -> !e.isMale()));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.COOKED_MUTTON, 1, e -> e.getLevel() > 1 && !e.isMale()));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.COOKED_PORKCHOP, 1, e -> e.getLevel() > 1));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.COOKIE, 1, e -> e.getLevel() > 3));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.EGG, 1, e -> e.getLevel() < 3));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.GOLDEN_APPLE, 1, e -> e.getLevel() > 3 && !e.isMale()));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.GOLDEN_CARROT, 1, e -> e.getLevel() > 3 && e.isMale()));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.MILK_BUCKET, 1, e -> e.getLevel() > 2));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.MUTTON, 1, e -> !e.isMale()));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.PORKCHOP, 1, e -> e.isMale()));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.PUMPKIN_PIE, 1, e -> e.getLevel() > 3));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.SUGAR, 1, null));
         
-//        this.getDesireSet().addItemDesire(new ItemDesire("Cookable", EntityChef.bestCookable(this), 0, this.getSkillLerp(ProfessionType.CHEF, 1, 3) * 8, 0, null));
-//        this.getDesireSet().addItemDesire(new UpgradeItemDesire("Axe", getBestAxe(), 1, 1, 1, p -> p.isWorkTime()));
+        // RESOURCES
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.COAL, 1, null));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.DIAMOND, 1, e -> e.getLevel() > 3));
+        this.getDesireSet().addItemDesire(new ItemDesire(Blocks.GOLD_ORE, 2, e -> !e.isMale()));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.GOLD_INGOT, 2, e -> !e.isMale()));
+        this.getDesireSet().addItemDesire(new ItemDesire(Blocks.IRON_ORE, 2, e -> e.isMale()));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.IRON_INGOT, 2, e -> e.isMale()));
+        this.getDesireSet().addItemDesire(new ItemDesire(Blocks.LOG, 3, null));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.REDSTONE, 5, e -> e.getLevel() > 2));
+        this.getDesireSet().addItemDesire(new ItemDesire(Blocks.WOOL, 1, null));
+        
+        // TOOLS
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.BOOK, 1, e -> !e.isMale()));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.BUCKET, 1, null));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.PAPER, 1, e -> e.getLevel() > 1));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.SHEARS, 1, e -> e.isMale()));
+        
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.IRON_AXE, 1, e -> e.getLevel() > 1));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.IRON_HOE, 1, e -> e.getLevel() > 1));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.IRON_PICKAXE, 1, e -> e.getLevel() > 1));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.IRON_SHOVEL, 1, e -> e.getLevel() > 1));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.DIAMOND_AXE, 1, e -> e.getLevel() > 3));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.DIAMOND_HOE, 1, e -> e.getLevel() > 3));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.DIAMOND_PICKAXE, 1, e -> e.getLevel() > 3));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.DIAMOND_SHOVEL, 1, e -> e.getLevel() > 3));
+        
+        // WEAPONS
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.IRON_SWORD, 1, e -> e.getLevel() > 1));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.DIAMOND_SWORD, 1, e -> e.getLevel() > 3));
+        
+        // ARMOR
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.IRON_HELMET, 1, e -> e.getLevel() > 1));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.IRON_CHESTPLATE, 1, e -> e.getLevel() > 1));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.IRON_LEGGINGS, 1, e -> e.getLevel() > 1));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.IRON_BOOTS, 1, e -> e.getLevel() > 1));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.DIAMOND_HELMET, 1, e -> e.getLevel() > 3));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.DIAMOND_CHESTPLATE, 1, e -> e.getLevel() > 3));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.DIAMOND_LEGGINGS, 1, e -> e.getLevel() > 3));
+        this.getDesireSet().addItemDesire(new ItemDesire(Items.DIAMOND_BOOTS, 1, e -> e.getLevel() > 3));
 	}
 
 	protected void setupServerJobs() {

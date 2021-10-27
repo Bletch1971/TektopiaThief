@@ -47,7 +47,7 @@ public class EntityAIEscapeVillage extends EntityAIMoveToBlock {
 	public boolean shouldContinueExecuting() {
 		Boolean result = this.active && this.navigator.canNavigate();
 		if (!result)
-			LoggerUtils.info("EntityAIEscapeVillage - shouldContinueExecuting called; this.active=" + this.active + "; this.stuck=" + this.stuck + " (" + this.stuckCount + "); canNavigate=" + this.navigator.canNavigate(), true);
+			LoggerUtils.info("EntityAIEscapeVillage - shouldContinueExecuting called; this.active=" + this.active + "; this.arrived=" + this.arrived + "; this.stuck=" + this.stuck + " (" + this.stuckCount + "); canNavigate=" + this.navigator.canNavigate(), true);
 		return result;
 	}
 
