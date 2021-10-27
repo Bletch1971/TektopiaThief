@@ -62,18 +62,8 @@
                 [ 2, -3, 2 ],
                 [ -2, -3, 2 ]
               ],
-              "texOffset": [ 44, 47 ],
-              "children": [
-                {
-                  "name": "ArmRightWrist",
-                  "position": [ 0, -1.5, 1 ],
-                  "offsetFromPivot": [ 0, 0, 0 ],
-                  "size": [ 1, 1, 1 ],
-                  "rotation": [ 0, 0, 0 ],
-                  "texOffset": [ 60, 1 ],
-                  "children": []
-                }
-              ]
+              "texOffset": [ 44, 37 ],
+              "children": []
             }
           ]
         },

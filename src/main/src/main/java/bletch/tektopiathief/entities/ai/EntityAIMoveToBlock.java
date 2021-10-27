@@ -12,7 +12,7 @@ import net.tangotek.tektopia.structures.VillageStructure;
 
 public abstract class EntityAIMoveToBlock extends EntityAIBase {
 	protected static int STUCK_TIME = 40;
-	protected static int MAX_STUCK_COUNT = 100;
+	protected static int MAX_STUCK_COUNT = 1000;
 	
 	protected final EntityVillageNavigator navigator;
 	protected BlockPos destinationPos;
@@ -59,7 +59,7 @@ public abstract class EntityAIMoveToBlock extends EntityAIBase {
 	public boolean shouldContinueExecuting() {
 		Boolean result = !this.arrived && !this.stuck && this.navigator.canNavigate();
 		if (!result)
-			LoggerUtils.info("EntityAIMoveToBlock - shouldContinueExecuting failed; this.arrived=" + this.arrived + "; this.stuck=" + this.stuck + "; canNavigate=" + this.navigator.canNavigate(), true);
+			LoggerUtils.info("EntityAIMoveToBlock - shouldContinueExecuting failed; this.arrived=" + this.arrived + "; this.stuck=" + this.stuck + " (" + this.stuckCount + "); canNavigate=" + this.navigator.canNavigate(), true);
 		return result;
 	}
 
@@ -102,7 +102,7 @@ public abstract class EntityAIMoveToBlock extends EntityAIBase {
 			}
 
 			if (this.stuck) {
-				this.stuckCount = Math.min(MAX_STUCK_COUNT, this.stuckCount++);
+				this.stuckCount = Math.min(MAX_STUCK_COUNT, ++this.stuckCount);
 				
 				if (this.stuckCount < MAX_STUCK_COUNT && this.attemptStuckFix() && this.lastPathIndex >= 0) {
 					this.navigator.getNavigator().clearPath();

@@ -42,16 +42,16 @@ public class CommandSpawn extends ThiefCommandBase {
 			spawnNearMe = true;
 		}
 
-		int value = 0;
+		int argValue = 0;
 		try {
-			value = Integer.parseInt(args[0]);
-			value = Math.max(Math.min(value, EntityThief.MAX_LEVEL), EntityThief.MIN_LEVEL);
+			argValue = Integer.parseInt(args[0]);
+			argValue = Math.max(Math.min(argValue, EntityThief.MAX_LEVEL), EntityThief.MIN_LEVEL);
 		}
 		catch (Exception ex) {
 			throw new WrongUsageException(ModCommands.COMMAND_PREFIX + COMMAND_NAME + ".usage", new Object[0]);
 		}
 		
-		int level = value;
+		int level = argValue;
 		
 		EntityPlayer entityPlayer = super.getCommandSenderAsPlayer(sender);
 		World world = entityPlayer != null ? entityPlayer.getEntityWorld() : null;

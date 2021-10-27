@@ -62,8 +62,8 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
 	public static final Integer MIN_LEVEL = 1;
 	public static final Integer MAX_LEVEL = 5;
 
-	public static long WORK_START_TIME = 13000L; // 19:00
-	public static long WORK_END_TIME = 23500L; // 05:30
+	public static long WORK_START_TIME = 13000L; // 19:00 (7:00 PM)
+	public static long WORK_END_TIME = 23500L; // 05:30 (5:30 AM)
 
 	protected static final AnimationHandler<EntityThief> animationHandler;
 	protected static final DataParameter<String> ANIMATION_KEY;
@@ -199,6 +199,12 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
 		float avoidDistance = this.getAvoidanceDistance() - 3.0F;
 
 		int light = this.world.getLightFor(EnumSkyBlock.BLOCK, this.getPosition());
+		// check for minecraft day time (6am - 7pm)
+		if (Village.isTimeOfDay(this.world, 0, 13000)) {
+			// light level is the maximum of Sky and block light
+			light = Math.max(light, this.world.getLightFor(EnumSkyBlock.SKY, this.getPosition()));
+		}
+		// make sure light level is between 0 and 15
 		float detectDistance = avoidDistance - 15 + light;
     	
 		LoggerUtils.info("EntityThief - getDetectionDistance called; avoidDistance=" + avoidDistance + "; light=" + light + "; detection distance=" + detectDistance, true);
@@ -275,7 +281,7 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
     }
 
 	public boolean isWorkTime() {
-		return isWorkTime(this.world) && !this.world.isRaining();
+		return isWorkTime(this.world, 0) && !this.world.isRaining();
 	}
     
     public void onDeath(DamageSource cause) {
@@ -384,7 +390,7 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
 		this.addTask(15, new EntityAIUseGate(this));
 		
 		this.addTask(30, new EntityAILeaveVillage(this, 
-				(e) -> !e.isWorkTime() && !e.hasAcquiredItem(), 
+				(e) -> !e.isWorkTime() && !e.getSeen() && !e.hasAcquiredItem(), 
 				(e) -> e.getVillage().getEdgeNode(), 
 				MovementMode.WALK, (Runnable)null, 
 				() -> {
@@ -544,9 +550,8 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
 		setupCraftStudioAnimations(animationHandler, ANIMATION_MODEL_NAME);
 	}
 
-	public static boolean isWorkTime(World world) {
-		long timeOfDay = Village.getTimeOfDay(world);
-		return timeOfDay > WORK_START_TIME || timeOfDay < WORK_END_TIME;
+	public static boolean isWorkTime(World world, int sleepOffset) {
+		return Village.isTimeOfDay(world, WORK_START_TIME, WORK_END_TIME, (long)sleepOffset);
 	}
 
 	protected static void setupCraftStudioAnimations(AnimationHandler<EntityThief> animationHandler, String modelName) {

@@ -14,7 +14,7 @@ public class ModEntities {
 	
 	public static final String ANIMATION_VILLAGER_RUN = "villager_run";
 	public static final String ANIMATION_VILLAGER_WALK = "villager_walk";
-	public static final String ANIMATION_VILLAGER_CREEP = "villager_walk_sad";
+	public static final String ANIMATION_VILLAGER_CREEP = "villager_creep";
 	
 	public static void register(IForgeRegistry<EntityEntry> registry) {
 		int id = 1;

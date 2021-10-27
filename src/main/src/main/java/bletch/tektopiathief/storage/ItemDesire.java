@@ -46,22 +46,6 @@ public class ItemDesire {
 		this.selfDirty = true;
 	}
 
-	public int getDeliverToStorage(EntityThief entity, ItemStack itemStack) {
-		this.update(entity);
-		
-		if (this.neededItemFunction.apply(itemStack) < 0) {
-			return itemStack.getCount();
-		}
-		
-		int thisLimit = entity.isStoragePriority() ? this.idealCount : this.limitCount;
-		
-		if (this.currentlyHave - thisLimit > 0) {
-			return Math.min(this.currentlyHave - this.idealCount, itemStack.getCount());
-		}
-		
-		return 0;
-	}
-
 	protected int getItemsHave(EntityThief entity) {
 		return entity.getInventory().getItemCount(this.neededItemFunction);
 	}

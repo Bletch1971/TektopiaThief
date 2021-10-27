@@ -24,6 +24,8 @@ public class ThiefScheduler implements IScheduler {
 	public void resetDay() {
 		if (this.resetDay)
 			return;
+		
+		LoggerUtils.info("ThiefScheduler - resetDay called", true);
 
 		// if it is day time, then clear the village checks
 		this.checkedVillages = false;
@@ -37,8 +39,10 @@ public class ThiefScheduler implements IScheduler {
 	@Override
 	public void update(World world) {
 		// do not process any further if we have already performed the check, it is raining or it is day
-		if (this.checkedVillages || world == null || world.isRaining() || !Village.isNightTime(world))
+		if (this.checkedVillages || world == null || world.isRaining() || !EntityThief.isWorkTime(world, 0))
 			return;
+		
+		LoggerUtils.info("ThiefScheduler - update called", true);
 		
 		this.resetDay = false;
 		this.checkedVillages = true;
