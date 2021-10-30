@@ -26,6 +26,7 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.ai.EntityAISwimming;
 import net.minecraft.entity.monster.IMob;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
@@ -277,11 +278,13 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
 	}
 
 	public boolean isFleeFrom(Entity e) {
-		return this.isHostile().test(e) || e instanceof EntityVillagerTek && ((EntityVillagerTek)e).isRole(VillagerRole.VILLAGER);
+		return this.isHostile().test(e) 
+				|| e instanceof EntityVillagerTek && ((EntityVillagerTek)e).isRole(VillagerRole.VILLAGER);
 	}
 
 	public com.google.common.base.Predicate<Entity> isHostile() {
-		return (e) -> e instanceof EntityVillagerTek && ((EntityVillagerTek)e).isRole(VillagerRole.DEFENDER);
+		return (e) -> e instanceof EntityVillagerTek && ((EntityVillagerTek)e).isRole(VillagerRole.DEFENDER)
+				|| ModConfig.thief.thiefdetectsplayer && e instanceof EntityPlayer;
 	}
 
 	public boolean isMale() {

@@ -6,6 +6,6 @@
   },
   "1.12.2":{
     "1.0.0": "Initial alpha release.",
-    "1.1.0": "Fixed escape notification.\nWhen killed will notify player of any dropped items."
+    "1.1.0": "Added config option for Thief to detect players.\nFixed escape notification.\nWhen killed will notify player of any dropped items."
   }	
 }

@@ -48,6 +48,10 @@ public class ModConfig {
 		@Config.LangKey("config.thief.thiefspawnswhenpeaceful")
 		public Boolean thiefSpawnsWhenPeaceful = true;
 		
+		@Config.Comment("If enabled, the Thief will detect players and flee from them. Default: False")
+		@Config.LangKey("config.thief.thiefdetectsplayer")
+		public Boolean thiefdetectsplayer = false;
+		
 	}
 	
 }

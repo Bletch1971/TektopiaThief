@@ -51,6 +51,8 @@ config.thief.checksvillagesize=Checks Village Size
 config.thief.checksvillagesize.tooltip=If enabled, when trying to spawn a thief it will check the size of the village. The more villagers the more often the thief will spawn.
 config.thief.thiefspawnswhenpeaceful=Thief Spawns on Peaceful Difficulty
 config.thief.thiefspawnswhenpeaceful.tooltop=If enabled, the Thief will spawn even if the difficulty is set to Peaceful.
+config.thief.thiefdetectsplayer=Thief Detects Players
+config.thief.thiefdetectsplayer.tooltop=If enabled, the Thief will detect players and flee from them.
 
 
 #============
