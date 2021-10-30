@@ -1,7 +1,10 @@
 package bletch.tektopiathief.entities;
 
-import java.util.ListIterator;
+import java.util.Iterator;
 import java.util.Set;
+
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.leviathanstudio.craftstudio.client.animation.ClientAnimationHandler;
 import com.leviathanstudio.craftstudio.common.animation.AnimationHandler;
 
@@ -21,7 +24,7 @@ import bletch.tektopiathief.entities.ai.EntityAIUseDoor;
 import bletch.tektopiathief.utils.LoggerUtils;
 import bletch.tektopiathief.utils.TextUtils;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.ai.EntityAISwimming;
@@ -36,6 +39,7 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -193,7 +197,21 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
 	}
 
 	public float getAvoidanceDistance() {
-		return this.getAvoidanceDistanceBase() - this.getLevel();
+		float avoidDistance = this.getAvoidanceDistanceBase() - this.getLevel();
+
+		int light = this.world.getLightFor(EnumSkyBlock.BLOCK, this.getPosition());
+		// check for minecraft day time (6am - 7pm)
+		if (Village.isTimeOfDay(this.world, 0, 13000)) {
+			// light level is the maximum of Sky and block light
+			light = Math.max(light, this.world.getLightFor(EnumSkyBlock.SKY, this.getPosition()));
+		}
+
+		light = (Math.max(0, Math.min(15, light)) + 1) / 2;
+		avoidDistance -= 8 - light;
+
+		LoggerUtils.info("EntityThief - getAvoidanceDistance called; avoidDistanceBase=" + this.getAvoidanceDistanceBase() + "; Level=" + this.getLevel() + "; light=" + light + "; avoidDistance=" + avoidDistance, true);
+
+		return Math.max(1.0F, avoidDistance);
 	}
 
 	public float getAvoidanceDistanceBase() {
@@ -209,20 +227,12 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
 	}
 
 	public float getDetectionDistance() {
-		float avoidDistance = this.getAvoidanceDistance() - 3.0F;
+		float avoidDistance = this.getAvoidanceDistance();
+		float detectDistance = avoidDistance - 5.0F;
 
-		int light = this.world.getLightFor(EnumSkyBlock.BLOCK, this.getPosition());
-		// check for minecraft day time (6am - 7pm)
-		if (Village.isTimeOfDay(this.world, 0, 13000)) {
-			// light level is the maximum of Sky and block light
-			light = Math.max(light, this.world.getLightFor(EnumSkyBlock.SKY, this.getPosition()));
-		}
-		// make sure light level is between 0 and 15
-		float detectDistance = avoidDistance - 15 + light;
+		LoggerUtils.info("EntityThief - getDetectionDistance called; avoidDistance=" + avoidDistance + "; detectDistance=" + detectDistance, true);
 
-		LoggerUtils.info("EntityThief - getDetectionDistance called; avoidDistance=" + avoidDistance + "; light=" + light + "; detection distance=" + detectDistance, true);
-
-		return Math.max(0.0F, detectDistance);
+		return Math.max(1.0F, detectDistance);
 	}
 
 	public ITextComponent getDisplayName() {
@@ -274,17 +284,13 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
 	}
 
 	public com.google.common.base.Predicate<Entity> isEnemy() {
-		return (e) -> this.isHostile().test(e);
+		return (e) -> e instanceof EntityVillagerTek && ((EntityVillagerTek)e).isRole(VillagerRole.DEFENDER)
+				|| ModConfig.thief.thiefdetectsplayer && e instanceof EntityPlayer;
 	}
 
 	public boolean isFleeFrom(Entity e) {
-		return this.isHostile().test(e) 
+		return this.isEnemy().test(e) 
 				|| e instanceof EntityVillagerTek && ((EntityVillagerTek)e).isRole(VillagerRole.VILLAGER);
-	}
-
-	public com.google.common.base.Predicate<Entity> isHostile() {
-		return (e) -> e instanceof EntityVillagerTek && ((EntityVillagerTek)e).isRole(VillagerRole.DEFENDER)
-				|| ModConfig.thief.thiefdetectsplayer && e instanceof EntityPlayer;
 	}
 
 	public boolean isMale() {
@@ -350,25 +356,30 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
 		if (detectionDistance == 0)
 			return;
 
+		@SuppressWarnings("unchecked")
+		Predicate<EntityLivingBase> entityPredicate = Predicates.and(EntitySelectors.CAN_AI_TARGET, 
+				e -> e.isEntityAlive() && e.canEntityBeSeen(this),
+				this.isEnemy());
+		
 		AxisAlignedBB boundingBox = this.getEntityBoundingBox().grow(detectionDistance, 6.0F, detectionDistance);
-		ListIterator<EntityLiving> entityList = this.world.getEntitiesWithinAABB(EntityLiving.class, boundingBox, this.isEnemy()).listIterator();
-
+		Iterator<EntityLivingBase> entityList = this.world.getEntitiesWithinAABB(EntityLivingBase.class, boundingBox, entityPredicate).stream()
+				.filter((e) -> e.getDistance(this) <= detectionDistance)
+				.iterator();
+				
 		while (entityList.hasNext()) {
-			EntityLiving entity = (EntityLiving)entityList.next();
+			EntityLivingBase entity = (EntityLivingBase)entityList.next();
+			
+			LoggerUtils.info("EntityThief - scanForEnemies called, seen by entity" 
+					+ "; entity=" + entity.getName() 
+					+ "; detection distance=" + detectionDistance 
+					+ "; distance=" + entity.getDistance(this)
+					, true);
 
-			if (entity.canEntityBeSeen(this)) {
-				LoggerUtils.info("EntityThief - scanForEnemies called, seen by entity" 
-						+ "; entity=" + entity.getName() 
-						+ "; detection distance=" + detectionDistance 
-						+ "; distance=" + entity.getDistance(this)
-						, true);
+			this.village.addOrRenewEnemy(this, 1);
 
-				if (!this.getSeen()) {
-					this.village.sendChatMessage(TextUtils.translate("message.thief.seen", new Object[0]));
-				}
-
-				this.village.addOrRenewEnemy(this, 1);
+			if (!this.getSeen()) {
 				this.setSeen(true);
+				this.village.sendChatMessage(TextUtils.translate("message.thief.seen", new Object[0]));
 			}
 		}		
 	}
@@ -456,72 +467,72 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
 		this.desireSet = new ItemDesireSet();
 
 		// CROPS
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.BEETROOT, 5, e -> e.isMale())); 
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.CARROT, 5, e -> !e.isMale()));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.POTATO, 5, null));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.WHEAT, 5, e -> e.getLevel() < 3));
+		this.desireSet.addItemDesire(new ItemDesire(Items.BEETROOT, 5, e -> e.isMale())); 
+		this.desireSet.addItemDesire(new ItemDesire(Items.CARROT, 5, e -> !e.isMale()));
+		this.desireSet.addItemDesire(new ItemDesire(Items.POTATO, 5, null));
+		this.desireSet.addItemDesire(new ItemDesire(Items.WHEAT, 5, e -> e.getLevel() < 3));
 
 		// FOOD
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.APPLE, 3, null));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.BAKED_POTATO, 2, e -> e.getLevel() > 1));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.BEEF, 1, e -> e.isMale()));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.BEETROOT_SOUP, 1, e -> e.getLevel() > 2));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.BREAD, 1, null));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.CAKE, 1, e -> e.getLevel() > 3));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.CHICKEN, 1, e -> !e.isMale()));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.COOKED_BEEF, 1, e -> e.getLevel() > 1 && e.isMale()));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.COOKED_CHICKEN, 1, e -> !e.isMale()));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.COOKED_MUTTON, 1, e -> e.getLevel() > 1 && !e.isMale()));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.COOKED_PORKCHOP, 1, e -> e.getLevel() > 1));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.COOKIE, 1, e -> e.getLevel() > 3));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.EGG, 1, e -> e.getLevel() < 3));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.GOLDEN_APPLE, 1, e -> e.getLevel() > 3 && !e.isMale()));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.GOLDEN_CARROT, 1, e -> e.getLevel() > 3 && e.isMale()));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.MILK_BUCKET, 1, e -> e.getLevel() > 2));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.MUTTON, 1, e -> !e.isMale()));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.PORKCHOP, 1, e -> e.isMale()));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.PUMPKIN_PIE, 1, e -> e.getLevel() > 3));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.SUGAR, 1, null));
+		this.desireSet.addItemDesire(new ItemDesire(Items.APPLE, 3, null));
+		this.desireSet.addItemDesire(new ItemDesire(Items.BAKED_POTATO, 2, e -> e.getLevel() > 1));
+		this.desireSet.addItemDesire(new ItemDesire(Items.BEEF, 1, e -> e.isMale()));
+		this.desireSet.addItemDesire(new ItemDesire(Items.BEETROOT_SOUP, 1, e -> e.getLevel() > 2));
+		this.desireSet.addItemDesire(new ItemDesire(Items.BREAD, 1, null));
+		this.desireSet.addItemDesire(new ItemDesire(Items.CAKE, 1, e -> e.getLevel() > 3));
+		this.desireSet.addItemDesire(new ItemDesire(Items.CHICKEN, 1, e -> !e.isMale()));
+		this.desireSet.addItemDesire(new ItemDesire(Items.COOKED_BEEF, 1, e -> e.getLevel() > 1 && e.isMale()));
+		this.desireSet.addItemDesire(new ItemDesire(Items.COOKED_CHICKEN, 1, e -> !e.isMale()));
+		this.desireSet.addItemDesire(new ItemDesire(Items.COOKED_MUTTON, 1, e -> e.getLevel() > 1 && !e.isMale()));
+		this.desireSet.addItemDesire(new ItemDesire(Items.COOKED_PORKCHOP, 1, e -> e.getLevel() > 1));
+		this.desireSet.addItemDesire(new ItemDesire(Items.COOKIE, 1, e -> e.getLevel() > 3));
+		this.desireSet.addItemDesire(new ItemDesire(Items.EGG, 1, e -> e.getLevel() < 3));
+		this.desireSet.addItemDesire(new ItemDesire(Items.GOLDEN_APPLE, 1, e -> e.getLevel() > 3 && !e.isMale()));
+		this.desireSet.addItemDesire(new ItemDesire(Items.GOLDEN_CARROT, 1, e -> e.getLevel() > 3 && e.isMale()));
+		this.desireSet.addItemDesire(new ItemDesire(Items.MILK_BUCKET, 1, e -> e.getLevel() > 2));
+		this.desireSet.addItemDesire(new ItemDesire(Items.MUTTON, 1, e -> !e.isMale()));
+		this.desireSet.addItemDesire(new ItemDesire(Items.PORKCHOP, 1, e -> e.isMale()));
+		this.desireSet.addItemDesire(new ItemDesire(Items.PUMPKIN_PIE, 1, e -> e.getLevel() > 3));
+		this.desireSet.addItemDesire(new ItemDesire(Items.SUGAR, 1, null));
 
 		// RESOURCES
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.COAL, 1, null));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.DIAMOND, 1, e -> e.getLevel() > 3));
-		this.getDesireSet().addItemDesire(new ItemDesire(Blocks.GOLD_ORE, 2, e -> !e.isMale()));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.GOLD_INGOT, 2, e -> !e.isMale()));
-		this.getDesireSet().addItemDesire(new ItemDesire(Blocks.IRON_ORE, 2, e -> e.isMale()));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.IRON_INGOT, 2, e -> e.isMale()));
-		this.getDesireSet().addItemDesire(new ItemDesire(Blocks.LOG, 3, null));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.REDSTONE, 5, e -> e.getLevel() > 2));
-		this.getDesireSet().addItemDesire(new ItemDesire(Blocks.WOOL, 1, null));
+		this.desireSet.addItemDesire(new ItemDesire(Items.COAL, 1, null));
+		this.desireSet.addItemDesire(new ItemDesire(Items.DIAMOND, 1, e -> e.getLevel() > 3));
+		this.desireSet.addItemDesire(new ItemDesire(Blocks.GOLD_ORE, 2, e -> !e.isMale()));
+		this.desireSet.addItemDesire(new ItemDesire(Items.GOLD_INGOT, 2, e -> !e.isMale()));
+		this.desireSet.addItemDesire(new ItemDesire(Blocks.IRON_ORE, 2, e -> e.isMale()));
+		this.desireSet.addItemDesire(new ItemDesire(Items.IRON_INGOT, 2, e -> e.isMale()));
+		this.desireSet.addItemDesire(new ItemDesire(Blocks.LOG, 3, null));
+		this.desireSet.addItemDesire(new ItemDesire(Items.REDSTONE, 5, e -> e.getLevel() > 2));
+		this.desireSet.addItemDesire(new ItemDesire(Blocks.WOOL, 1, null));
 
 		// TOOLS
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.BOOK, 1, e -> !e.isMale()));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.BUCKET, 1, null));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.PAPER, 1, e -> e.getLevel() > 1));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.SHEARS, 1, e -> e.isMale()));
+		this.desireSet.addItemDesire(new ItemDesire(Items.BOOK, 1, e -> !e.isMale()));
+		this.desireSet.addItemDesire(new ItemDesire(Items.BUCKET, 1, null));
+		this.desireSet.addItemDesire(new ItemDesire(Items.PAPER, 1, e -> e.getLevel() > 1));
+		this.desireSet.addItemDesire(new ItemDesire(Items.SHEARS, 1, e -> e.isMale()));
 
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.IRON_AXE, 1, e -> e.getLevel() > 1));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.IRON_HOE, 1, e -> e.getLevel() > 1));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.IRON_PICKAXE, 1, e -> e.getLevel() > 1));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.IRON_SHOVEL, 1, e -> e.getLevel() > 1));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.DIAMOND_AXE, 1, e -> e.getLevel() > 3));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.DIAMOND_HOE, 1, e -> e.getLevel() > 3));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.DIAMOND_PICKAXE, 1, e -> e.getLevel() > 3));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.DIAMOND_SHOVEL, 1, e -> e.getLevel() > 3));
+		this.desireSet.addItemDesire(new ItemDesire(Items.IRON_AXE, 1, e -> e.getLevel() > 1));
+		this.desireSet.addItemDesire(new ItemDesire(Items.IRON_HOE, 1, e -> e.getLevel() > 1));
+		this.desireSet.addItemDesire(new ItemDesire(Items.IRON_PICKAXE, 1, e -> e.getLevel() > 1));
+		this.desireSet.addItemDesire(new ItemDesire(Items.IRON_SHOVEL, 1, e -> e.getLevel() > 1));
+		this.desireSet.addItemDesire(new ItemDesire(Items.DIAMOND_AXE, 1, e -> e.getLevel() > 3));
+		this.desireSet.addItemDesire(new ItemDesire(Items.DIAMOND_HOE, 1, e -> e.getLevel() > 3));
+		this.desireSet.addItemDesire(new ItemDesire(Items.DIAMOND_PICKAXE, 1, e -> e.getLevel() > 3));
+		this.desireSet.addItemDesire(new ItemDesire(Items.DIAMOND_SHOVEL, 1, e -> e.getLevel() > 3));
 
 		// WEAPONS
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.IRON_SWORD, 1, e -> e.getLevel() > 1));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.DIAMOND_SWORD, 1, e -> e.getLevel() > 3));
+		this.desireSet.addItemDesire(new ItemDesire(Items.IRON_SWORD, 1, e -> e.getLevel() > 1));
+		this.desireSet.addItemDesire(new ItemDesire(Items.DIAMOND_SWORD, 1, e -> e.getLevel() > 3));
 
 		// ARMOR
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.IRON_HELMET, 1, e -> e.getLevel() > 1));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.IRON_CHESTPLATE, 1, e -> e.getLevel() > 1));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.IRON_LEGGINGS, 1, e -> e.getLevel() > 1));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.IRON_BOOTS, 1, e -> e.getLevel() > 1));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.DIAMOND_HELMET, 1, e -> e.getLevel() > 3));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.DIAMOND_CHESTPLATE, 1, e -> e.getLevel() > 3));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.DIAMOND_LEGGINGS, 1, e -> e.getLevel() > 3));
-		this.getDesireSet().addItemDesire(new ItemDesire(Items.DIAMOND_BOOTS, 1, e -> e.getLevel() > 3));
+		this.desireSet.addItemDesire(new ItemDesire(Items.IRON_HELMET, 1, e -> e.getLevel() > 1));
+		this.desireSet.addItemDesire(new ItemDesire(Items.IRON_CHESTPLATE, 1, e -> e.getLevel() > 1));
+		this.desireSet.addItemDesire(new ItemDesire(Items.IRON_LEGGINGS, 1, e -> e.getLevel() > 1));
+		this.desireSet.addItemDesire(new ItemDesire(Items.IRON_BOOTS, 1, e -> e.getLevel() > 1));
+		this.desireSet.addItemDesire(new ItemDesire(Items.DIAMOND_HELMET, 1, e -> e.getLevel() > 3));
+		this.desireSet.addItemDesire(new ItemDesire(Items.DIAMOND_CHESTPLATE, 1, e -> e.getLevel() > 3));
+		this.desireSet.addItemDesire(new ItemDesire(Items.DIAMOND_LEGGINGS, 1, e -> e.getLevel() > 3));
+		this.desireSet.addItemDesire(new ItemDesire(Items.DIAMOND_BOOTS, 1, e -> e.getLevel() > 3));
 	}
 
 	protected void setupServerJobs() {

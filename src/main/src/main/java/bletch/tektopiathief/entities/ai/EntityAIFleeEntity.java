@@ -8,8 +8,12 @@ import bletch.tektopiathief.entities.EntityThief.MovementMode;
 import bletch.tektopiathief.utils.LoggerUtils;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.EntitySelectors;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.tangotek.tektopia.ModSoundEvents;
@@ -17,22 +21,22 @@ import net.tangotek.tektopia.pathing.BasePathingNode;
 
 public class EntityAIFleeEntity extends EntityAIMoveToBlock {
 	protected final EntityThief entity;
-	protected final Predicate<Entity> entityPredicate;
+	protected final Predicate<EntityLivingBase> entityPredicate;
 	protected final Predicate<EntityThief> shouldPred;
-	protected Entity fleeEntity;
+	protected EntityLivingBase fleeEntity;
 	protected BlockPos destinationPosition;
 	protected final MovementMode moveMode;
 
 	@SuppressWarnings("unchecked")
-	public EntityAIFleeEntity(EntityThief entity, Predicate<EntityThief> shouldPred, Predicate<Entity> inPred) {
+	public EntityAIFleeEntity(EntityThief entity, Predicate<EntityThief> shouldPred, Predicate<EntityLivingBase> filterPred) {
 		super(entity);
 		this.entity = entity;
 		this.shouldPred = shouldPred;
 		this.moveMode = MovementMode.RUN;
 		this.setMutexBits(1);
 		this.entityPredicate = Predicates.and(EntitySelectors.CAN_AI_TARGET, 
-				e -> e.isEntityAlive() && this.entity.getEntitySenses().canSee(e),
-				inPred);
+				e -> e.isEntityAlive() && e.canEntityBeSeen(this.entity),
+				filterPred);
 	}
 
 	public boolean shouldExecute() {
@@ -42,26 +46,27 @@ public class EntityAIFleeEntity extends EntityAIMoveToBlock {
 			if (avoidDistance == 0)
 				return false;
 			
-			List<Entity> fleeEntities = this.entity.world.getEntitiesInAABBexcluding(this.entity, this.entity.getEntityBoundingBox().grow(avoidDistance, 6.0D, avoidDistance), this.entityPredicate);
-
-			fleeEntities.sort((c1, c2) -> {
-				return Double.compare(c1.getDistance(this.entity), c2.getDistance(this.entity));
-			});
+			AxisAlignedBB boundingBox = this.entity.getEntityBoundingBox().grow(avoidDistance, 6.0F, avoidDistance);
+			List<EntityLivingBase> fleeEntities = this.entity.world.getEntitiesWithinAABB(EntityLivingBase.class, boundingBox, this.entityPredicate).stream()
+					.filter((e) -> e.getDistance(this.entity) <= avoidDistance)
+					.sorted((e1, e2) -> Double.compare(e1.getDistance(this.entity), e2.getDistance(this.entity)))
+					.collect(Collectors.toList());
 			
-			if (!fleeEntities.isEmpty()) {
-				this.fleeEntity = (Entity)fleeEntities.get(0);
-				LoggerUtils.info("EntityAIFleeEntity - shouldExecute called" 
-						+ "; entity=" + this.fleeEntity.getName() 
-						+ "; avoidDistance=" + avoidDistance 
-						+ "; distance=" + this.fleeEntity.getDistance(this.entity)
-						, true);
-				
-				BlockPos fleeBlock = this.findRandomPositionAwayFrom(this.fleeEntity);
+			if (fleeEntities == null || fleeEntities.isEmpty())
+				return false;
+			
+			this.fleeEntity = fleeEntities.get(0);
+			LoggerUtils.info("EntityAIFleeEntity - shouldExecute called" 
+					+ "; entity=" + this.fleeEntity.getName() 
+					+ "; avoid Distance=" + avoidDistance 
+					+ "; distance=" + this.fleeEntity.getDistance(this.entity)
+					, true);
+			
+			BlockPos fleeBlock = this.findRandomPositionAwayFrom(this.fleeEntity);
 
-				if (fleeBlock != null) {
-					this.destinationPosition = fleeBlock;
-					return super.shouldExecute();
-				}
+			if (fleeBlock != null) {
+				this.destinationPosition = fleeBlock;
+				return super.shouldExecute();
 			}
 		}
 
@@ -71,7 +76,7 @@ public class EntityAIFleeEntity extends EntityAIMoveToBlock {
 	public void startExecuting() {
 		LoggerUtils.info("EntityAIFleeEntity - startExecuting called", true);
 		
-		if (this.entity.isEnemy().test(this.fleeEntity)) {
+		if (this.entityPredicate.test(this.fleeEntity)) {
 			if (this.entity.getRNG().nextInt(2) == 0) {
 				this.entity.playSound(ModSoundEvents.villagerAfraid);
 			}
