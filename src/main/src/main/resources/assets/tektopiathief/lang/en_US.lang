@@ -61,7 +61,7 @@ config.thief.thiefdetectsplayer.tooltop=If enabled, the Thief will detect player
 commands.thief.usage=/thief
 
 commands.thief.spawn.usage=/thief spawn <level> [me]
-commands.thief.spawn.success=§aThief (level %s) has appeared at %s
+commands.thief.spawn.success=§aThief has appeared at %s
 commands.thief.spawn.failed=§cThief spawn failed
 commands.thief.spawn.badconditions=§cThief spawn failed...spawn conditions not valid
 commands.thief.spawn.exists=§eThief spawn failed...Thief already located in the village
@@ -80,7 +80,7 @@ commands.thief.kill.success=§aThief has been killed
 
 message.thief.exists=§cThief already located in village %s
 message.thief.noposition.village=§cCould not find a spawn location for the Thief in village %s
-message.thief.spawned.village=§aThief has appeared in village %s at %s
+message.thief.spawned.village=§aThief (level %s) has appeared in village %s at %s
 message.thief.villagecheckfailed=§cThief village check failed, village  %s; size %s; check value %s
 message.thief.villagechecksuccess=§cThief village check success, village  %s; size %s; check value %s
 message.thief.spawnblocked=§cThief spawn blocked by storage marker rotation in village %s

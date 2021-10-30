@@ -98,8 +98,8 @@ public class CommandSpawn extends ThiefCommandBase {
 			return;
 		}
 		
-		notifyCommandListener(sender, this, "commands.thief.spawn.success", new Object[] { level, TektopiaUtils.formatBlockPos(spawnPosition) });
-		LoggerUtils.info(TextUtils.translate("commands.thief.spawn.success", new Object[] { level, TektopiaUtils.formatBlockPos(spawnPosition) }), true);
+		notifyCommandListener(sender, this, "commands.thief.spawn.success", new Object[] { TektopiaUtils.formatBlockPos(spawnPosition) });
+		LoggerUtils.info(TextUtils.translate("commands.thief.spawn.success", new Object[] { TektopiaUtils.formatBlockPos(spawnPosition) }), true);
 	}
     
 }

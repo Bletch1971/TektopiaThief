@@ -87,7 +87,7 @@ public class ThiefScheduler implements IScheduler {
 					
 					// attempt spawn
 					if (TektopiaUtils.trySpawnEntity(world, spawnPosition, (World w) -> new EntityThief(w, villageLevel))) {
-						LoggerUtils.info(TextUtils.translate("message.thief.spawned.village", new Object[] { villageName, TektopiaUtils.formatBlockPos(spawnPosition) }), true);
+						LoggerUtils.info(TextUtils.translate("message.thief.spawned.village", new Object[] { villageLevel, villageName, TektopiaUtils.formatBlockPos(spawnPosition) }), true);
 					} else {
 						LoggerUtils.info(TextUtils.translate("message.thief.noposition.village", new Object[] { villageName }), true);
 					}
