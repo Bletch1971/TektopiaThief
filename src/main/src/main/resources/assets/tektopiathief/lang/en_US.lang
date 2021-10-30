@@ -85,7 +85,9 @@ message.thief.spawnblocked=§cThief spawn blocked by storage marker rotation in 
 message.thief.peaceful=§cThief spawn schedule skipped, difficulty set to Peaceful
 
 message.thief.seen=§6A Thief has been spotted in the village
-message.thief.escaped=§6A Thief has escaped the village with %s
+message.thief.escaped=§6A Thief has escaped the village
+message.thief.escapedseen=§6The Thief has escaped the village
+message.thief.escapedwith=with %s
 message.thief.killed=§dThe Thief has been killed
 message.thief.killedby=by %s
 message.thief.damage=§dThe Thief has taken %s damage
