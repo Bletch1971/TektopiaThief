@@ -2,7 +2,6 @@ package bletch.tektopiathief.commands;
 
 import java.util.List;
 
-import bletch.tektopiathief.core.ModCommands;
 import bletch.tektopiathief.entities.EntityThief;
 import bletch.tektopiathief.utils.LoggerUtils;
 import bletch.tektopiathief.utils.TextUtils;
@@ -15,18 +14,18 @@ import net.minecraft.world.World;
 import net.tangotek.tektopia.Village;
 import net.tangotek.tektopia.VillageManager;
 
-public class CommandKill extends ThiefCommandBase {
+public class CommandThiefKill extends CommandThiefBase {
 
 	private static final String COMMAND_NAME = "kill";
 	
-	public CommandKill() {
+	public CommandThiefKill() {
 		super(COMMAND_NAME);
 	}
 
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		if (args.length > 0) {
-			throw new WrongUsageException(ModCommands.COMMAND_PREFIX + COMMAND_NAME + ".usage", new Object[0]);
+			throw new WrongUsageException(ThiefCommands.COMMAND_PREFIX + COMMAND_NAME + ".usage", new Object[0]);
 		} 
 		
 		EntityPlayer entityPlayer = super.getCommandSenderAsPlayer(sender);
@@ -35,15 +34,15 @@ public class CommandKill extends ThiefCommandBase {
 		VillageManager villageManager = world != null ? VillageManager.get(world) : null;
 		Village village = villageManager != null && entityPlayer != null ? villageManager.getVillageAt(entityPlayer.getPosition()) : null;
 		if (village == null) {
-			notifyCommandListener(sender, this, ModCommands.COMMAND_PREFIX + COMMAND_NAME + ".novillage", new Object[0]);
-			LoggerUtils.info(TextUtils.translate(ModCommands.COMMAND_PREFIX + COMMAND_NAME + ".novillage", new Object[0]), true);
+			notifyCommandListener(sender, this, ThiefCommands.COMMAND_PREFIX + COMMAND_NAME + ".novillage", new Object[0]);
+			LoggerUtils.info(TextUtils.translate(ThiefCommands.COMMAND_PREFIX + COMMAND_NAME + ".novillage", new Object[0]), true);
 			return;
 		}
 
         List<EntityThief> entityList = world.getEntitiesWithinAABB(EntityThief.class, village.getAABB().grow(Village.VILLAGE_SIZE));
         if (entityList.size() == 0) {
-			notifyCommandListener(sender, this, ModCommands.COMMAND_PREFIX + COMMAND_NAME + ".noexists", new Object[0]);
-			LoggerUtils.info(TextUtils.translate(ModCommands.COMMAND_PREFIX + COMMAND_NAME + ".noexists", new Object[0]), true);
+			notifyCommandListener(sender, this, ThiefCommands.COMMAND_PREFIX + COMMAND_NAME + ".noexists", new Object[0]);
+			LoggerUtils.info(TextUtils.translate(ThiefCommands.COMMAND_PREFIX + COMMAND_NAME + ".noexists", new Object[0]), true);
 			return;
         }
         
@@ -53,8 +52,8 @@ public class CommandKill extends ThiefCommandBase {
         	
         	entity.setDead();
     		
-    		notifyCommandListener(sender, this, ModCommands.COMMAND_PREFIX + COMMAND_NAME + ".success", new Object[0]);
-    		LoggerUtils.info(TextUtils.translate(ModCommands.COMMAND_PREFIX + COMMAND_NAME + ".success", new Object[0]), true);
+    		notifyCommandListener(sender, this, ThiefCommands.COMMAND_PREFIX + COMMAND_NAME + ".success", new Object[0]);
+    		LoggerUtils.info(TextUtils.translate(ThiefCommands.COMMAND_PREFIX + COMMAND_NAME + ".success", new Object[0]), true);
         }
 	}
     

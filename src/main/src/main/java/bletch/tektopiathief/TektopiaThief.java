@@ -4,7 +4,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 import com.leviathanstudio.craftstudio.client.registry.CraftStudioLoader;
 
-import bletch.tektopiathief.core.ModCommands;
+import bletch.tektopiathief.commands.ThiefCommands;
 import bletch.tektopiathief.core.ModCommonProxy;
 import bletch.tektopiathief.core.ModDetails;
 import bletch.tektopiathief.core.ModEntities;
@@ -61,14 +61,15 @@ public class TektopiaThief {
     
 	@Mod.EventHandler
 	public void onServerStarting(final FMLServerStartingEvent e) {
-		
-		LoggerUtils.info("Starting registerServerCommand...");
-		// register commands
-		ModCommands commands = new ModCommands();
+
+		LoggerUtils.info("Starting command registrations...");
+
+		LoggerUtils.info("Registering thief commands");
+		ThiefCommands commands = new ThiefCommands();
 		e.registerServerCommand(commands);
 		commands.registerNodes();
-		
-		LoggerUtils.info("Finished registerServerCommand...");
+
+		LoggerUtils.info("Finished command registrations");
 		
 		World world = e.getServer().getEntityWorld();
 		
@@ -78,7 +79,7 @@ public class TektopiaThief {
 		scheduleManager = new ScheduleManager(world);
 		scheduleManager.addScheduler(new ThiefScheduler());
 		
-		LoggerUtils.info("Finished ScheduleManager setup...");
+		LoggerUtils.info("Finished ScheduleManager setup");
 	}
 	
     @EventBusSubscriber

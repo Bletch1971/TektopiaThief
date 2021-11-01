@@ -1,21 +1,20 @@
-package bletch.tektopiathief.core;
+package bletch.tektopiathief.commands;
 
-import bletch.tektopiathief.commands.CommandKill;
-import bletch.tektopiathief.commands.CommandSpawn;
+import bletch.tektopiathief.core.ModDetails;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.server.command.CommandTreeBase;
 import net.minecraftforge.server.permission.DefaultPermissionLevel;
 import net.minecraftforge.server.permission.PermissionAPI;
 
-public class ModCommands extends CommandTreeBase {
+public class ThiefCommands extends CommandTreeBase {
 
 	public static final String COMMAND_PREFIX = "commands.thief.";
 	public static final String COMMAND_PREFIX_WITH_MODID = ModDetails.MOD_ID + "." + COMMAND_PREFIX;
 	
-	public ModCommands() {
-		super.addSubcommand(new CommandKill());
-		super.addSubcommand(new CommandSpawn());
+	public ThiefCommands() {
+		super.addSubcommand(new CommandThiefKill());
+		super.addSubcommand(new CommandThiefSpawn());
 	}
 
 	public void registerNodes() {
