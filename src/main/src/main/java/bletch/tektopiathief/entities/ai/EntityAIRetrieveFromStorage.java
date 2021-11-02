@@ -157,10 +157,10 @@ public class EntityAIRetrieveFromStorage extends EntityAIMoveToBlock {
 		if (this.isNearDestination(5.0D) && !this.chest.isInvalid()) {
 			this.itemTaken = this.retrieveDesire.pickUpItems(this.entity);
 			
-			if (this.itemTaken != ItemStack.EMPTY) {
-				this.itemAcquired(this.itemTaken);
-			} else {
+			if (this.itemTaken == null || this.itemTaken.isEmpty()) {
 				this.entity.getDesireSet().forceUpdate();
+			} else {
+				this.itemAcquired(this.itemTaken);
 			}
 		}
 	}
@@ -169,7 +169,7 @@ public class EntityAIRetrieveFromStorage extends EntityAIMoveToBlock {
 		this.autoCheck = true;
 		this.entity.setStoragePriority();
 		
-		Boolean acquired = this.entity.getInventory().addItem(itemStack) == ItemStack.EMPTY;
+		Boolean acquired = !this.entity.getInventory().addItem(itemStack).isEmpty();
 		if (acquired) {
 			String aquiredItemDescription = itemStack.getDisplayName() + " x " + itemStack.getCount();
 			LoggerUtils.info("EntityAIRetrieveFromStorage - itemAcquired called; acquired=" + aquiredItemDescription, true);

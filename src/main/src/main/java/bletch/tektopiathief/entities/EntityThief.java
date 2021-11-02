@@ -436,7 +436,7 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
 										: TextUtils.translate("message.thief.escaped", new Object[0]);
 						ItemStack aquiredItem = this.getAquiredItem();
 
-						if (aquiredItem != ItemStack.EMPTY) {
+						if (aquiredItem != null && !aquiredItem.isEmpty()) {
 							String aquiredItemDescription = aquiredItem.getDisplayName();
 							if (aquiredItem.getCount() > 1) {
 								aquiredItemDescription +=  " x " + aquiredItem.getCount();
