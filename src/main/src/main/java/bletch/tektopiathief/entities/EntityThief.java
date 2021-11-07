@@ -71,7 +71,7 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
 	public static final Integer MIN_LEVEL = 1;
 	public static final Integer MAX_LEVEL = 5;
 
-	public static long WORK_START_TIME = 22000L; // 22:00 (10:00 PM)
+	public static long WORK_START_TIME = 16000L; // 22:00 (10:00 PM)
 	public static long WORK_END_TIME = 23500L; // 05:30 (5:30 AM)
 
 	protected static final AnimationHandler<EntityThief> animationHandler;
