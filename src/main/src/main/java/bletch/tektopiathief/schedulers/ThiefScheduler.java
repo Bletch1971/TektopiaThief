@@ -1,6 +1,8 @@
 package bletch.tektopiathief.schedulers;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import bletch.tektopiathief.core.ModConfig;
 import bletch.tektopiathief.entities.EntityThief;
@@ -16,6 +18,8 @@ import net.tangotek.tektopia.structures.VillageStructure;
 import net.tangotek.tektopia.structures.VillageStructureType;
 
 public class ThiefScheduler implements IScheduler {
+	
+	protected static Map<Village, Integer> gracePeriods = new HashMap<Village, Integer>();
 
 	protected Boolean checkedVillages = false;
 	protected Boolean resetDay = false;
@@ -30,6 +34,8 @@ public class ThiefScheduler implements IScheduler {
 		// if it is day time, then clear the village checks
 		this.checkedVillages = false;
 		this.resetDay = true;
+		
+		reduceGracePeriods();
 	}
 
 	@Override
@@ -61,6 +67,12 @@ public class ThiefScheduler implements IScheduler {
 		villages.forEach((v) -> {
 			
 			String villageName = v.getName();
+			
+			int gracePeriod = getGracePeriod(v);
+			if (gracePeriod > 0) {
+				LoggerUtils.info(TextUtils.translate("message.thief.graceperiod", new Object[] { villageName }), true);
+				return;
+			}
 			
 			VillageStructure storage = v.getNearestStructure(VillageStructureType.STORAGE, v.getOrigin());
 			if (storage != null) {
@@ -100,5 +112,23 @@ public class ThiefScheduler implements IScheduler {
 				LoggerUtils.info(TextUtils.translate("message.thief.villagecheckfailed", new Object[] { villageName, villageLevel, villageCheck }), true);
 			}
 		});
+	}
+	
+	public static int getGracePeriod(Village village) {
+		return village == null ? 0 : gracePeriods.getOrDefault(village, 0);
+	}
+	
+	public static void reduceGracePeriods() {
+		gracePeriods.forEach((v, p) -> setGracePeriod(v, p - 1));
+	}
+	
+	public static void setGracePeriod(Village village, int gracePeriod) {
+		if (village == null)
+			return;
+		
+		if (gracePeriod <= 0)
+			gracePeriods.remove(village);
+		else 
+			gracePeriods.put(village, gracePeriod);
 	}
 }

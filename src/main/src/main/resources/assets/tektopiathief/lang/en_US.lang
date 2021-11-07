@@ -85,6 +85,7 @@ message.thief.villagecheckfailed=§cThief village check failed, village  %s; siz
 message.thief.villagechecksuccess=§cThief village check success, village  %s; size %s; check value %s
 message.thief.spawnblocked=§cThief spawn blocked by storage marker rotation in village %s
 message.thief.peaceful=§cThief spawn schedule skipped, difficulty set to Peaceful
+message.thief.graceperiod=§cThief spawn skipped due to grace period in village %s
 
 message.thief.seen=§6A Thief has been spotted in the village
 message.thief.escaped=§6A Thief has escaped the village

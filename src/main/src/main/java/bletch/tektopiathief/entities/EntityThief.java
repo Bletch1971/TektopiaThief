@@ -17,6 +17,7 @@ import bletch.tektopiathief.entities.ai.EntityAIIdleCheck;
 import bletch.tektopiathief.entities.ai.EntityAILeaveVillage;
 import bletch.tektopiathief.entities.ai.EntityAIRetrieveFromStorage;
 import bletch.tektopiathief.entities.ai.EntityAIUseGate;
+import bletch.tektopiathief.schedulers.ThiefScheduler;
 import bletch.tektopiathief.storage.ItemDesire;
 import bletch.tektopiathief.storage.ItemDesireSet;
 import bletch.tektopiathief.storage.ModInventory;
@@ -439,7 +440,9 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
 								: TextUtils.translate("message.thief.escaped", new Object[0]);
 						ItemStack aquiredItem = this.getAquiredItem();
 
-						if (aquiredItem != null && !aquiredItem.isEmpty()) {							
+						if (aquiredItem != null && !aquiredItem.isEmpty()) {		
+							ThiefScheduler.setGracePeriod(this.village, 2);
+							
 							String aquiredItemDescription = aquiredItem.getDisplayName();
 							if (aquiredItem.getCount() > 1) {
 								aquiredItemDescription +=  " x " + aquiredItem.getCount();

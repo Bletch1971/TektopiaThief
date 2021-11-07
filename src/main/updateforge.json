@@ -7,6 +7,6 @@
   "1.12.2":{
     "1.0.0": "Initial alpha release.",
     "1.1.0": "Updated entity models.\nAdded config option for Thief to detect players.\nFixed escape notification.\nWhen killed will notify player of any dropped items.\nSpawn and Kill command clean-up.",
-    "1.2.0": "Added glowing effect to the thief when seen.\nMinor adjustments to the desire counts.\nChanged start time of thief to 10:00pm"
+    "1.2.0": "Added glowing effect to the thief when seen.\nMinor adjustments to the desire counts.\nChanged start time of thief to 10:00pm.\nAdded a grace period of 2 days after the thief successfully steals an item from the village."
   }	
 }
