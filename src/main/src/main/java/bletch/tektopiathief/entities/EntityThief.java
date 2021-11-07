@@ -436,7 +436,7 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
 					if (this.hasAcquiredItem()) {
 						String message = this.getSeen() 
 								? TextUtils.translate("message.thief.escapedseen", new Object[0])
-										: TextUtils.translate("message.thief.escaped", new Object[0]);
+								: TextUtils.translate("message.thief.escaped", new Object[0]);
 						ItemStack aquiredItem = this.getAquiredItem();
 
 						if (aquiredItem != null && !aquiredItem.isEmpty()) {
@@ -444,7 +444,7 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
 							if (aquiredItem.getCount() > 1) {
 								aquiredItemDescription +=  " x " + aquiredItem.getCount();
 							}
-							message += TextUtils.translate("message.thief.escapedwith", new Object[] { aquiredItemDescription });
+							message += " " + TextUtils.translate("message.thief.escapedwith", new Object[] { aquiredItemDescription });
 						}
 
 						this.village.sendChatMessage(message);
