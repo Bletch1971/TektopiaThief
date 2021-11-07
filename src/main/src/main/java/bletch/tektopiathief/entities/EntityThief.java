@@ -70,7 +70,7 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
 	public static final Integer MIN_LEVEL = 1;
 	public static final Integer MAX_LEVEL = 5;
 
-	public static long WORK_START_TIME = 13000L; // 19:00 (7:00 PM)
+	public static long WORK_START_TIME = 22000L; // 22:00 (10:00 PM)
 	public static long WORK_END_TIME = 23500L; // 05:30 (5:30 AM)
 
 	protected static final AnimationHandler<EntityThief> animationHandler;
@@ -79,7 +79,7 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
 	protected static final DataParameter<Integer> LEVEL;
 	protected static final DataParameter<Byte> MOVEMENT_MODE;
 	protected static final DataParameter<Boolean> SEEN;
-
+	
 	private BlockPos firstCheck;
 	private MovementMode lastMovementMode;
 	private int idle;
@@ -198,6 +198,10 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
 		return null;
 	}
 
+	public ItemStack getAquiredItem() {
+		return this.inventory.getStackInSlot(0);
+	}
+
 	public float getAvoidanceDistance() {
 		float avoidDistance = this.getAvoidanceDistanceBase() - this.getLevel();
 
@@ -270,10 +274,6 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
 
 	public World getWorld() {
 		return this.world;
-	}
-
-	public ItemStack getAquiredItem() {
-		return this.inventory.getStackInSlot(0);
 	}
 
 	public Boolean hasAcquiredItem() {
@@ -439,7 +439,7 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
 								: TextUtils.translate("message.thief.escaped", new Object[0]);
 						ItemStack aquiredItem = this.getAquiredItem();
 
-						if (aquiredItem != null && !aquiredItem.isEmpty()) {
+						if (aquiredItem != null && !aquiredItem.isEmpty()) {							
 							String aquiredItemDescription = aquiredItem.getDisplayName();
 							if (aquiredItem.getCount() > 1) {
 								aquiredItemDescription +=  " x " + aquiredItem.getCount();
