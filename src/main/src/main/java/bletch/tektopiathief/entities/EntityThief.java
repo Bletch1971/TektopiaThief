@@ -32,12 +32,14 @@ import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.init.MobEffects;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.SoundCategory;
@@ -379,6 +381,7 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
 
 			if (!this.getSeen()) {
 				this.setSeen(true);
+				this.addPotionEffect(new PotionEffect(MobEffects.GLOWING, 60));
 				this.village.sendChatMessage(TextUtils.translate("message.thief.seen", new Object[0]));
 			}
 		}		
@@ -473,11 +476,11 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
 		this.desireSet.addItemDesire(new ItemDesire(Items.WHEAT, 5, e -> e.getLevel() < 3));
 
 		// FOOD
-		this.desireSet.addItemDesire(new ItemDesire(Items.APPLE, 3, null));
-		this.desireSet.addItemDesire(new ItemDesire(Items.BAKED_POTATO, 2, e -> e.getLevel() > 1));
+		this.desireSet.addItemDesire(new ItemDesire(Items.APPLE, 4, null));
+		this.desireSet.addItemDesire(new ItemDesire(Items.BAKED_POTATO, 3, e -> e.getLevel() > 1));
 		this.desireSet.addItemDesire(new ItemDesire(Items.BEEF, 1, e -> e.isMale()));
 		this.desireSet.addItemDesire(new ItemDesire(Items.BEETROOT_SOUP, 1, e -> e.getLevel() > 2));
-		this.desireSet.addItemDesire(new ItemDesire(Items.BREAD, 1, null));
+		this.desireSet.addItemDesire(new ItemDesire(Items.BREAD, 2, null));
 		this.desireSet.addItemDesire(new ItemDesire(Items.CAKE, 1, e -> e.getLevel() > 3));
 		this.desireSet.addItemDesire(new ItemDesire(Items.CHICKEN, 1, e -> !e.isMale()));
 		this.desireSet.addItemDesire(new ItemDesire(Items.COOKED_BEEF, 1, e -> e.getLevel() > 1 && e.isMale()));
@@ -485,17 +488,17 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
 		this.desireSet.addItemDesire(new ItemDesire(Items.COOKED_MUTTON, 1, e -> e.getLevel() > 1 && !e.isMale()));
 		this.desireSet.addItemDesire(new ItemDesire(Items.COOKED_PORKCHOP, 1, e -> e.getLevel() > 1));
 		this.desireSet.addItemDesire(new ItemDesire(Items.COOKIE, 1, e -> e.getLevel() > 3));
-		this.desireSet.addItemDesire(new ItemDesire(Items.EGG, 1, e -> e.getLevel() < 3));
+		this.desireSet.addItemDesire(new ItemDesire(Items.EGG, 4, e -> e.getLevel() < 3));
 		this.desireSet.addItemDesire(new ItemDesire(Items.GOLDEN_APPLE, 1, e -> e.getLevel() > 3 && !e.isMale()));
 		this.desireSet.addItemDesire(new ItemDesire(Items.GOLDEN_CARROT, 1, e -> e.getLevel() > 3 && e.isMale()));
 		this.desireSet.addItemDesire(new ItemDesire(Items.MILK_BUCKET, 1, e -> e.getLevel() > 2));
 		this.desireSet.addItemDesire(new ItemDesire(Items.MUTTON, 1, e -> !e.isMale()));
 		this.desireSet.addItemDesire(new ItemDesire(Items.PORKCHOP, 1, e -> e.isMale()));
 		this.desireSet.addItemDesire(new ItemDesire(Items.PUMPKIN_PIE, 1, e -> e.getLevel() > 3));
-		this.desireSet.addItemDesire(new ItemDesire(Items.SUGAR, 1, null));
+		this.desireSet.addItemDesire(new ItemDesire(Items.SUGAR, 5, null));
 
 		// RESOURCES
-		this.desireSet.addItemDesire(new ItemDesire(Items.COAL, 1, null));
+		this.desireSet.addItemDesire(new ItemDesire(Items.COAL, 5, null));
 		this.desireSet.addItemDesire(new ItemDesire(Items.DIAMOND, 1, e -> e.getLevel() > 3));
 		this.desireSet.addItemDesire(new ItemDesire(Blocks.GOLD_ORE, 2, e -> !e.isMale()));
 		this.desireSet.addItemDesire(new ItemDesire(Items.GOLD_INGOT, 2, e -> !e.isMale()));
@@ -503,12 +506,12 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
 		this.desireSet.addItemDesire(new ItemDesire(Items.IRON_INGOT, 2, e -> e.isMale()));
 		this.desireSet.addItemDesire(new ItemDesire(Blocks.LOG, 3, null));
 		this.desireSet.addItemDesire(new ItemDesire(Items.REDSTONE, 5, e -> e.getLevel() > 2));
-		this.desireSet.addItemDesire(new ItemDesire(Blocks.WOOL, 1, null));
+		this.desireSet.addItemDesire(new ItemDesire(Blocks.WOOL, 2, null));
 
 		// TOOLS
 		this.desireSet.addItemDesire(new ItemDesire(Items.BOOK, 1, e -> !e.isMale()));
 		this.desireSet.addItemDesire(new ItemDesire(Items.BUCKET, 1, null));
-		this.desireSet.addItemDesire(new ItemDesire(Items.PAPER, 1, e -> e.getLevel() > 1));
+		this.desireSet.addItemDesire(new ItemDesire(Items.PAPER, 4, e -> e.getLevel() > 1));
 		this.desireSet.addItemDesire(new ItemDesire(Items.SHEARS, 1, e -> e.isMale()));
 
 		this.desireSet.addItemDesire(new ItemDesire(Items.IRON_AXE, 1, e -> e.getLevel() > 1));
