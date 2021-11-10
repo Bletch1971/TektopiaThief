@@ -11,27 +11,27 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public class ModEntities {
-	
-	public static final String ANIMATION_VILLAGER_RUN = "villager_run";
-	public static final String ANIMATION_VILLAGER_WALK = "villager_walk";
-	public static final String ANIMATION_VILLAGER_CREEP = "villager_creep";
-	
-	public static void register(IForgeRegistry<EntityEntry> registry) {
-		int id = 1;
-		
-		registry.register(EntityEntryBuilder.create()
-			    .entity(EntityThief.class)
-			    .id(new ResourceLocation(ModDetails.MOD_ID, EntityThief.RESOURCE_PATH), id++)
-			    .name(EntityThief.ENTITY_NAME)
-			    .egg(2697513, 7494986)
-			    .tracker(128, 1, true)
-			    .build()
-	    );
-	}
-    
-	@SideOnly(Side.CLIENT)
-	public static void registerModels() {
-		RenderingRegistry.registerEntityRenderingHandler(EntityThief.class, RenderThief.FACTORY);
-	}
+
+    public static final String ANIMATION_VILLAGER_RUN = "villager_run";
+    public static final String ANIMATION_VILLAGER_WALK = "villager_walk";
+    public static final String ANIMATION_VILLAGER_CREEP = "villager_creep";
+
+    public static void register(IForgeRegistry<EntityEntry> registry) {
+        int id = 1;
+
+        registry.register(EntityEntryBuilder.create()
+                .entity(EntityThief.class)
+                .id(new ResourceLocation(ModDetails.MOD_ID, EntityThief.RESOURCE_PATH), id++)
+                .name(EntityThief.ENTITY_NAME)
+                .egg(2697513, 7494986)
+                .tracker(128, 1, true)
+                .build()
+        );
+    }
+
+    @SideOnly(Side.CLIENT)
+    public static void registerModels() {
+        RenderingRegistry.registerEntityRenderingHandler(EntityThief.class, RenderThief.FACTORY);
+    }
 
 }

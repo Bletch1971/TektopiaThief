@@ -11,241 +11,239 @@ import net.tangotek.tektopia.pathing.PathNavigateVillager2;
 import net.tangotek.tektopia.structures.VillageStructure;
 
 public abstract class EntityAIMoveToBlock extends EntityAIBase {
-	protected static int STUCK_TIME = 40;
-	protected static int MAX_STUCK_COUNT = 1000;
-	
-	protected final EntityVillageNavigator navigator;
-	protected BlockPos destinationPos;
-	protected BlockPos walkPos;
-	protected int pathUpdateTick = 20;
-	protected boolean arrived = false;
-	protected int stuckCheck;
-	protected Vec3d stuckPos;
-	protected boolean stuck;
-	protected int lastPathIndex;
-	protected int stuckCount = 0;
+    protected static int STUCK_TIME = 40;
+    protected static int MAX_STUCK_COUNT = 1000;
 
-	public EntityAIMoveToBlock(EntityVillageNavigator navigator) {
-		this.navigator = navigator;
-		this.stuckCheck = STUCK_TIME;
-		this.stuckPos = Vec3d.ZERO;
-		this.stuck = false;
-		this.lastPathIndex = -1;
-		this.setMutexBits(1);
-	}
+    protected final EntityVillageNavigator navigator;
+    protected BlockPos destinationPos;
+    protected BlockPos walkPos;
+    protected int pathUpdateTick = 20;
+    protected boolean arrived = false;
+    protected int stuckCheck;
+    protected Vec3d stuckPos;
+    protected boolean stuck;
+    protected int lastPathIndex;
+    protected int stuckCount = 0;
 
-	public boolean shouldExecute() {
-		if (this.navigator.hasVillage() && this.navigator.getNavigator() instanceof PathNavigateVillager2 && this.canNavigate()) {
-			this.destinationPos = this.getDestinationBlock();
+    public EntityAIMoveToBlock(EntityVillageNavigator navigator) {
+        this.navigator = navigator;
+        this.stuckCheck = STUCK_TIME;
+        this.stuckPos = Vec3d.ZERO;
+        this.stuck = false;
+        this.lastPathIndex = -1;
+        this.setMutexBits(1);
+    }
 
-			if (this.destinationPos != null) {
-				this.stuck = false;
-				this.stuckPos = new Vec3d(0.0D, -400.0D, 0.0D);
-				this.arrived = false;
-				this.pathUpdateTick = 40;
-				this.doMove();
-				
-				return !this.stuck;
-			}
-		}
+    public boolean shouldExecute() {
+        if (this.navigator.hasVillage() && this.navigator.getNavigator() instanceof PathNavigateVillager2 && this.canNavigate()) {
+            this.destinationPos = this.getDestinationBlock();
 
-		return false;
-	}
+            if (this.destinationPos != null) {
+                this.stuck = false;
+                this.stuckPos = new Vec3d(0.0D, -400.0D, 0.0D);
+                this.arrived = false;
+                this.pathUpdateTick = 40;
+                this.doMove();
 
-	public void startExecuting() {
-		this.updateMovementMode();
-	}
+                return !this.stuck;
+            }
+        }
 
-	public boolean shouldContinueExecuting() {
-		Boolean result = !this.arrived && !this.stuck && this.navigator.canNavigate();
-		if (!result)
-			LoggerUtils.info("EntityAIMoveToBlock - shouldContinueExecuting failed; this.arrived=" + this.arrived + "; this.stuck=" + this.stuck + " (" + this.stuckCount + "); canNavigate=" + this.navigator.canNavigate(), true);
-		return result;
-	}
+        return false;
+    }
 
-	public void updateTask() {
-		--this.pathUpdateTick;
-		if (this.pathUpdateTick <= 0 && !this.arrived) {
-			this.pathUpdateTick = 40;
-			this.navigator.updateMovement(this.arrived);
-		}
+    public void startExecuting() {
+        this.updateMovementMode();
+    }
 
-		if (!this.arrived && this.isNearWalkPos()) {
-			this.arrived = true;
-			this.navigator.getNavigator().clearPath();
-			this.onArrival();
-		}
+    public boolean shouldContinueExecuting() {
+        boolean result = !this.arrived && !this.stuck && this.navigator.canNavigate();
+        if (!result)
+            LoggerUtils.info("EntityAIMoveToBlock - shouldContinueExecuting failed; this.arrived=" + this.arrived + "; this.stuck=" + this.stuck + " (" + this.stuckCount + "); canNavigate=" + this.navigator.canNavigate(), true);
+        return result;
+    }
 
-		this.updateFacing();
-		if (!this.arrived) {
-			
-			if (this.navigator.getNavigator().noPath()) {
-				this.doMove();
-			} else {
-				
-				int pathIndex = this.navigator.getNavigator().getPath().getCurrentPathIndex();
-				if (this.lastPathIndex != pathIndex) {
-					this.lastPathIndex = pathIndex;
-				}
-			}
+    public void updateTask() {
+        --this.pathUpdateTick;
+        if (this.pathUpdateTick <= 0 && !this.arrived) {
+            this.pathUpdateTick = 40;
+            this.navigator.updateMovement(this.arrived);
+        }
 
-			--this.stuckCheck;
-			if (this.stuckCheck < 0) {
-				this.stuckCheck = STUCK_TIME;
-				
-				if (!this.navigator.getNavigator().noPath()) {
-					this.stuck = this.navigator.getPositionVector().squareDistanceTo(this.stuckPos) < 1.0D;
-					this.stuckPos = this.navigator.getPositionVector();
-				} else {
-					LoggerUtils.info("has no path?", true);
-				}
-			}
+        if (!this.arrived && this.isNearWalkPos()) {
+            this.arrived = true;
+            this.navigator.getNavigator().clearPath();
+            this.onArrival();
+        }
 
-			if (this.stuck) {
-				this.stuckCount = Math.min(MAX_STUCK_COUNT, ++this.stuckCount);
-				
-				if (this.stuckCount < MAX_STUCK_COUNT && this.attemptStuckFix() && this.lastPathIndex >= 0) {
-					this.navigator.getNavigator().clearPath();
-					this.doMove();
-				} else {
-					this.onStuck();
-				}
-			}
-		}
-	}
+        this.updateFacing();
+        if (!this.arrived) {
 
-	public void resetTask() {
-		super.resetTask();
-		this.arrived = false;
-		this.stuckCheck = STUCK_TIME;
-		this.navigator.resetMovement();
-	}
+            if (this.navigator.getNavigator().noPath()) {
+                this.doMove();
+            } else {
 
-	protected boolean attemptStuckFix() {
-		return false;
-	}
+                int pathIndex = this.navigator.getNavigator().getPath().getCurrentPathIndex();
+                if (this.lastPathIndex != pathIndex) {
+                    this.lastPathIndex = pathIndex;
+                }
+            }
 
-	protected boolean canNavigate() {
-		return this.navigator.onGround;
-	}
+            --this.stuckCheck;
+            if (this.stuckCheck < 0) {
+                this.stuckCheck = STUCK_TIME;
 
-	protected void doMove() {
-		this.arrived = false;
-		this.stuckCheck = STUCK_TIME;
-		this.walkPos = this.findWalkPos();
+                if (!this.navigator.getNavigator().noPath()) {
+                    this.stuck = this.navigator.getPositionVector().squareDistanceTo(this.stuckPos) < 1.0D;
+                    this.stuckPos = this.navigator.getPositionVector();
+                } else {
+                    LoggerUtils.info("has no path?", true);
+                }
+            }
 
-		if (this.walkPos == null) {
-			this.stuck = true;
-			
-		} else if (!this.isNearWalkPos() && this.canNavigate()) {
-			boolean pathFound = this.navigator.getNavigator().tryMoveToXYZ((double)this.walkPos.getX(), (double)this.walkPos.getY(), (double)this.walkPos.getZ(), (double)this.navigator.getAIMoveSpeed());
-			
-			if (pathFound) {
-				this.navigator.getLookHelper().setLookPosition((double)this.walkPos.getX(), (double)this.walkPos.getY(), (double)this.walkPos.getZ(), 50.0F, (float)this.navigator.getVerticalFaceSpeed());
-			} else {
-				this.onPathFailed(this.walkPos);
-			}
-		}
-	}
+            if (this.stuck) {
+                this.stuckCount = Math.min(MAX_STUCK_COUNT, ++this.stuckCount);
 
-	protected BlockPos findWalkPos() {
-		final BlockPos pos = this.destinationPos;
-		final BlockPos diff = this.navigator.getPosition().subtract(pos);
-		final EnumFacing facing = EnumFacing.getFacingFromVector((float)diff.getX(), 0.0f, (float)diff.getZ());
+                if (this.stuckCount < MAX_STUCK_COUNT && this.attemptStuckFix() && this.lastPathIndex >= 0) {
+                    this.navigator.getNavigator().clearPath();
+                    this.doMove();
+                } else {
+                    this.onStuck();
+                }
+            }
+        }
+    }
 
-		BlockPos testPos = pos.offset(facing);
-		if (this.isWalkable(testPos, this.navigator)) {
-			return testPos;
-		}
-		testPos = pos.offset(facing).offset(facing.rotateY());
-		if (this.isWalkable(testPos, this.navigator)) {
-			return testPos;
-		}
-		testPos = pos.offset(facing).offset(facing.rotateYCCW());
-		if (this.isWalkable(testPos, this.navigator)) {
-			return testPos;
-		}
-		testPos = pos.offset(facing.rotateY());
-		if (this.isWalkable(testPos, this.navigator)) {
-			return testPos;
-		}
-		testPos = pos.offset(facing.rotateYCCW());
-		if (this.isWalkable(testPos, this.navigator)) {
-			return testPos;
-		}
-		testPos = pos.offset(facing.getOpposite());
-		if (this.isWalkable(testPos, this.navigator)) {
-			return testPos;
-		}
-		testPos = pos.offset(facing.getOpposite()).offset(facing.rotateY());
-		if (this.isWalkable(testPos, this.navigator)) {
-			return testPos;
-		}
-		testPos = pos.offset(facing.getOpposite()).offset(facing.rotateYCCW());
-		if (this.isWalkable(testPos, this.navigator)) {
-			return testPos;
-		}
-		if (this.isWalkable(pos, this.navigator)) {
-			return pos;
-		}
-		return null;
-	}
+    public void resetTask() {
+        super.resetTask();
+        this.arrived = false;
+        this.stuckCheck = STUCK_TIME;
+        this.navigator.resetMovement();
+    }
 
-	protected abstract BlockPos getDestinationBlock();
+    protected boolean attemptStuckFix() {
+        return false;
+    }
 
-	public BlockPos getWalkPos() {
-		return this.walkPos;
-	}
+    protected boolean canNavigate() {
+        return this.navigator.onGround;
+    }
 
-	protected boolean hasArrived() {
-		return this.arrived;
-	}
+    protected void doMove() {
+        this.arrived = false;
+        this.stuckCheck = STUCK_TIME;
+        this.walkPos = this.findWalkPos();
 
-	protected boolean isNearDestination(double range) {
-		return this.destinationPos.distanceSq(this.navigator.getPosition()) < range * range;
-	}
+        if (this.walkPos == null) {
+            this.stuck = true;
 
-	protected boolean isNearWalkPos() {
-		return this.walkPos != null && this.walkPos.distanceSq(this.navigator.getPosition()) <= 1.0D;
-	}
+        } else if (!this.isNearWalkPos() && this.canNavigate()) {
+            boolean pathFound = this.navigator.getNavigator().tryMoveToXYZ(this.walkPos.getX(), this.walkPos.getY(), this.walkPos.getZ(), this.navigator.getAIMoveSpeed());
 
-	protected boolean isWalkable(BlockPos pos, EntityVillageNavigator entity) {
-		if (entity.getVillage() != null) {
-			BasePathingNode baseNode = entity.getVillage().getPathingGraph().getBaseNode(pos.getX(), pos.getY(), pos.getZ());
+            if (pathFound) {
+                this.navigator.getLookHelper().setLookPosition(this.walkPos.getX(), this.walkPos.getY(), this.walkPos.getZ(), 50.0F, (float) this.navigator.getVerticalFaceSpeed());
+            } else {
+                this.onPathFailed(this.walkPos);
+            }
+        }
+    }
 
-			if (baseNode != null) {
-				if (!VillageStructure.isWoodDoor(entity.world, pos) && !VillageStructure.isGate(entity.world, pos)) {
-					return true;
-				}
-			}
-		}
+    protected BlockPos findWalkPos() {
+        final BlockPos pos = this.destinationPos;
+        final BlockPos diff = this.navigator.getPosition().subtract(pos);
+        final EnumFacing facing = EnumFacing.getFacingFromVector((float) diff.getX(), 0.0f, (float) diff.getZ());
 
-		return false;
-	}
+        BlockPos testPos = pos.offset(facing);
+        if (this.isWalkable(testPos, this.navigator)) {
+            return testPos;
+        }
+        testPos = pos.offset(facing).offset(facing.rotateY());
+        if (this.isWalkable(testPos, this.navigator)) {
+            return testPos;
+        }
+        testPos = pos.offset(facing).offset(facing.rotateYCCW());
+        if (this.isWalkable(testPos, this.navigator)) {
+            return testPos;
+        }
+        testPos = pos.offset(facing.rotateY());
+        if (this.isWalkable(testPos, this.navigator)) {
+            return testPos;
+        }
+        testPos = pos.offset(facing.rotateYCCW());
+        if (this.isWalkable(testPos, this.navigator)) {
+            return testPos;
+        }
+        testPos = pos.offset(facing.getOpposite());
+        if (this.isWalkable(testPos, this.navigator)) {
+            return testPos;
+        }
+        testPos = pos.offset(facing.getOpposite()).offset(facing.rotateY());
+        if (this.isWalkable(testPos, this.navigator)) {
+            return testPos;
+        }
+        testPos = pos.offset(facing.getOpposite()).offset(facing.rotateYCCW());
+        if (this.isWalkable(testPos, this.navigator)) {
+            return testPos;
+        }
+        if (this.isWalkable(pos, this.navigator)) {
+            return pos;
+        }
+        return null;
+    }
 
-	protected void onArrival() {
-	}
+    protected abstract BlockPos getDestinationBlock();
 
-	protected void onPathFailed(BlockPos pos) {
-		this.stuck = true;
-	}
+    public BlockPos getWalkPos() {
+        return this.walkPos;
+    }
 
-	protected void onStuck() {
-		this.navigator.getNavigator().clearPath();
-	}
+    protected boolean hasArrived() {
+        return this.arrived;
+    }
 
-	protected void setArrived() {
-		this.arrived = true;
-	}
+    protected boolean isNearDestination(double range) {
+        return this.destinationPos.distanceSq(this.navigator.getPosition()) < range * range;
+    }
 
-	protected void updateFacing() {
-		if (!this.arrived) {
-			if (!this.navigator.getNavigator().noPath()) {
-				Vec3d lookPos = this.navigator.getNavigator().getPath().getCurrentPos();
-				this.navigator.faceLocation(lookPos.x, lookPos.z, 4.0F);
-			}
-		}
-	} 
+    protected boolean isNearWalkPos() {
+        return this.walkPos != null && this.walkPos.distanceSq(this.navigator.getPosition()) <= 1.0D;
+    }
 
-	abstract void updateMovementMode();
+    protected boolean isWalkable(BlockPos pos, EntityVillageNavigator entity) {
+        if (entity.getVillage() != null) {
+            BasePathingNode baseNode = entity.getVillage().getPathingGraph().getBaseNode(pos.getX(), pos.getY(), pos.getZ());
+
+            if (baseNode != null) {
+                return !VillageStructure.isWoodDoor(entity.world, pos) && !VillageStructure.isGate(entity.world, pos);
+            }
+        }
+
+        return false;
+    }
+
+    protected void onArrival() {
+    }
+
+    protected void onPathFailed(BlockPos pos) {
+        this.stuck = true;
+    }
+
+    protected void onStuck() {
+        this.navigator.getNavigator().clearPath();
+    }
+
+    protected void setArrived() {
+        this.arrived = true;
+    }
+
+    protected void updateFacing() {
+        if (!this.arrived) {
+            if (!this.navigator.getNavigator().noPath()) {
+                Vec3d lookPos = this.navigator.getNavigator().getPath().getCurrentPos();
+                this.navigator.faceLocation(lookPos.x, lookPos.z, 4.0F);
+            }
+        }
+    }
+
+    abstract void updateMovementMode();
 }

@@ -5,48 +5,46 @@ import bletch.tektopiathief.utils.LoggerUtils;
 import net.minecraft.entity.ai.EntityAIBase;
 
 public class EntityAIIdleCheck extends EntityAIBase {
-	protected final EntityThief entity;
-	private int idleTicks = 0;
+    protected final EntityThief entity;
+    private int idleTicks = 0;
 
-	public EntityAIIdleCheck(EntityThief entity) {
-		this.entity = entity;
-		this.setMutexBits(7);
-	}
+    public EntityAIIdleCheck(EntityThief entity) {
+        this.entity = entity;
+        this.setMutexBits(7);
+    }
 
-	public boolean shouldExecute() {
-		if (this.entity.isAITick() && this.entity.hasVillage())
-			return true;
-		return false;
-	}
+    public boolean shouldExecute() {
+        return this.entity.isAITick() && this.entity.hasVillage();
+    }
 
-	public void startExecuting() {
-		LoggerUtils.info("EntityAIIdleCheck - startExecuting called", true);
-		
-		this.idleTicks = 0;
-	}
+    public void startExecuting() {
+        LoggerUtils.info("EntityAIIdleCheck - startExecuting called", true);
 
-	public boolean shouldContinueExecuting() {
-		return true;
-	}
+        this.idleTicks = 0;
+    }
 
-	public void updateTask() {
-		++this.idleTicks;
-		if (this.idleTicks % 80 == 0) {
-			this.entity.setStoragePriority();
-		}
+    public boolean shouldContinueExecuting() {
+        return true;
+    }
 
-		this.entity.setIdle(this.idleTicks);
-		if (this.idleTicks % 1200 == 0) {
-			LoggerUtils.info("Thief idle for " + this.idleTicks / 20 + " seconds", true);
-		}
-	}
+    public void updateTask() {
+        ++this.idleTicks;
+        if (this.idleTicks % 80 == 0) {
+            this.entity.setStoragePriority();
+        }
 
-	public void resetTask() {
-		LoggerUtils.info("EntityAIIdleCheck - resetTask called", true);
-		
-		this.entity.setIdle(0);
-		if (this.idleTicks >= 1200) {
-			LoggerUtils.info("Thief was idle for " + this.idleTicks / 20 + " seconds.", true);
-		}
-	}
+        this.entity.setIdle(this.idleTicks);
+        if (this.idleTicks % 1200 == 0) {
+            LoggerUtils.info("Thief idle for " + this.idleTicks / 20 + " seconds", true);
+        }
+    }
+
+    public void resetTask() {
+        LoggerUtils.info("EntityAIIdleCheck - resetTask called", true);
+
+        this.entity.setIdle(0);
+        if (this.idleTicks >= 1200) {
+            LoggerUtils.info("Thief was idle for " + this.idleTicks / 20 + " seconds.", true);
+        }
+    }
 }
