@@ -30,7 +30,7 @@ repositories {
 }
 
 dependencies {
-    compile files('../../../../JavaWorkspaces/tektopia/CraftStudioAPI-1.0.0.93-mc1.12-alpha.jar')
+    compile files('../../../../JavaWorkspaces/_craftstudio/CraftStudioAPI-1.0.0.93-mc1.12-alpha-dev.jar')
 	compile files('../../../../JavaWorkspaces/tektopia/Tektopia-1.12.2-1.1.0-deobf.jar')
 }
 
