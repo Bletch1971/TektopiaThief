@@ -27,15 +27,10 @@ minecraft {
 }
 
 repositories {
-    maven {
-        name = "leviathan"
-        url = "https://repo.leviathan-studio.com/leviathan/"
-    }
 }
 
 dependencies {
-	deobfCompile "com.leviathanstudio:CraftStudioAPI:${project.craftstudio_version}-mc1.12-alpha:dev"
-	
+    compile files('../../../../JavaWorkspaces/tektopia/CraftStudioAPI-1.0.0.93-mc1.12-alpha.jar')
 	compile files('../../../../JavaWorkspaces/tektopia/Tektopia-1.12.2-1.1.0-deobf.jar')
 }
 
