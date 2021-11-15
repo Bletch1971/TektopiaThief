@@ -1,10 +1,10 @@
 package bletch.tektopiathief;
 
+import bletch.common.schedulers.ScheduleManager;
 import bletch.tektopiathief.commands.ThiefCommands;
 import bletch.tektopiathief.core.ModCommonProxy;
 import bletch.tektopiathief.core.ModDetails;
 import bletch.tektopiathief.core.ModEntities;
-import bletch.tektopiathief.schedulers.ScheduleManager;
 import bletch.tektopiathief.schedulers.ThiefScheduler;
 import bletch.tektopiathief.utils.LoggerUtils;
 import com.leviathanstudio.craftstudio.client.registry.CraftStudioLoader;
@@ -44,8 +44,8 @@ public class TektopiaThief {
     public void preInitialize(FMLPreInitializationEvent e) {
         instance = this;
 
-        proxy.preInitialize(e);
         proxy.resetDebug();
+        proxy.preInitialize(e);
     }
 
     @Mod.EventHandler

@@ -1,5 +1,8 @@
 package bletch.tektopiathief.entities;
 
+import bletch.common.entities.ai.EntityAIUseDoor;
+import bletch.common.entities.ai.EntityAIUseGate;
+import bletch.common.utils.TextUtils;
 import bletch.tektopiathief.core.ModConfig;
 import bletch.tektopiathief.core.ModDetails;
 import bletch.tektopiathief.core.ModEntities;
@@ -9,7 +12,6 @@ import bletch.tektopiathief.storage.ItemDesire;
 import bletch.tektopiathief.storage.ItemDesireSet;
 import bletch.tektopiathief.storage.ModInventory;
 import bletch.tektopiathief.utils.LoggerUtils;
-import bletch.tektopiathief.utils.TextUtils;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.leviathanstudio.craftstudio.client.animation.ClientAnimationHandler;

@@ -38,6 +38,8 @@ public class ModCommonProxy {
     }
 
     public void resetDebug() {
+		LoggerUtils.Initialise(ModDetails.MOD_NAME, getMinecraftDirectory() + ModDetails.FILE_DEBUGLOG);
+		
         if (ModConfig.debug.enableDebug) {
             LoggerUtils.resetDebug();
         }

@@ -1,10 +1,11 @@
 package bletch.tektopiathief.schedulers;
 
+import bletch.common.schedulers.IScheduler;
+import bletch.common.utils.TektopiaUtils;
+import bletch.common.utils.TextUtils;
 import bletch.tektopiathief.core.ModConfig;
 import bletch.tektopiathief.entities.EntityThief;
 import bletch.tektopiathief.utils.LoggerUtils;
-import bletch.tektopiathief.utils.TektopiaUtils;
-import bletch.tektopiathief.utils.TextUtils;
 import net.minecraft.entity.item.EntityItemFrame;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.EnumDifficulty;
@@ -98,7 +99,7 @@ public class ThiefScheduler implements IScheduler {
                     BlockPos spawnPosition = TektopiaUtils.getVillageSpawnPoint(world, v);
 
                     // attempt spawn
-                    if (TektopiaUtils.trySpawnEntity(world, spawnPosition, (World w) -> new EntityThief(w, villageLevel))) {
+                    if (TektopiaUtils.trySpawnPersistenceEntity(world, spawnPosition, (World w) -> new EntityThief(w, villageLevel))) {
                         LoggerUtils.info(TextUtils.translate("message.thief.spawned.village", villageLevel, villageName, TektopiaUtils.formatBlockPos(spawnPosition)), true);
                     } else {
                         LoggerUtils.info(TextUtils.translate("message.thief.noposition.village", villageName), true);

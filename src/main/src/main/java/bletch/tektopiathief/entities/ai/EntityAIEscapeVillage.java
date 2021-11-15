@@ -1,5 +1,6 @@
 package bletch.tektopiathief.entities.ai;
 
+import bletch.common.entities.ai.EntityAIMoveToBlock;
 import bletch.tektopiathief.entities.EntityThief;
 import bletch.tektopiathief.entities.EntityThief.MovementMode;
 import bletch.tektopiathief.utils.LoggerUtils;
@@ -95,7 +96,7 @@ public class EntityAIEscapeVillage extends EntityAIMoveToBlock {
         super.onStuck();
     }
 
-    void updateMovementMode() {
+    protected void updateMovementMode() {
         LoggerUtils.info("EntityAIEscapeVillage - updateMovementMode called with mode " + this.moveMode.name(), true);
 
         this.entity.setMovementMode(this.moveMode);

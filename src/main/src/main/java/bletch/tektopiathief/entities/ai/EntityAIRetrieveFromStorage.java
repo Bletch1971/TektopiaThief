@@ -1,5 +1,6 @@
 package bletch.tektopiathief.entities.ai;
 
+import bletch.common.entities.ai.EntityAIMoveToBlock;
 import bletch.tektopiathief.entities.EntityThief;
 import bletch.tektopiathief.entities.EntityThief.MovementMode;
 import bletch.tektopiathief.storage.ItemDesire;

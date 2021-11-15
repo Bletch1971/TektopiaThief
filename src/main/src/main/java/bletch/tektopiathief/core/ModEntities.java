@@ -1,5 +1,6 @@
 package bletch.tektopiathief.core;
 
+import bletch.common.core.CommonEntities;
 import bletch.tektopiathief.entities.EntityThief;
 import bletch.tektopiathief.entities.render.RenderThief;
 import net.minecraft.util.ResourceLocation;
@@ -10,11 +11,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.registries.IForgeRegistry;
 
-public class ModEntities {
-
-    public static final String ANIMATION_VILLAGER_RUN = "villager_run";
-    public static final String ANIMATION_VILLAGER_WALK = "villager_walk";
-    public static final String ANIMATION_VILLAGER_CREEP = "villager_creep";
+public class ModEntities extends CommonEntities {
 
     public static void register(IForgeRegistry<EntityEntry> registry) {
         int id = 1;
