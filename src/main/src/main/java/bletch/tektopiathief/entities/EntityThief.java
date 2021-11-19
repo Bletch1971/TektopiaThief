@@ -40,6 +40,8 @@ import net.minecraft.world.World;
 import net.tangotek.tektopia.Village;
 import net.tangotek.tektopia.VillagerRole;
 import net.tangotek.tektopia.entities.EntityVillagerTek;
+import net.tangotek.tektopia.structures.VillageStructure;
+import net.tangotek.tektopia.structures.VillageStructureType;
 import net.tangotek.tektopia.tickjob.TickJob;
 
 import java.util.Iterator;
@@ -96,6 +98,8 @@ public class EntityThief extends EntityEnemyBase implements IInventoryEntity, ID
                     message += " " + TextUtils.translate("message.thief.damagefrom", damagedBy.getDisplayName().getUnformattedText());
 
                     if (damagedBy instanceof EntityVillagerTek) {
+                        this.addPotionEffect(new PotionEffect(MobEffects.GLOWING, 60));
+                        
                         // only output the damage message if a villager is responsible for the damage
                         this.village.sendChatMessage(message);
                     }
@@ -163,7 +167,25 @@ public class EntityThief extends EntityEnemyBase implements IInventoryEntity, ID
 
     @Override
     public float getAIMoveSpeed() {
-        return (0.20F + this.getLevel() * 0.02F) * this.getMovementMode().speedMultiplier;
+    	MovementMode movementMode = this.getMovementMode();
+    	
+    	switch (movementMode) {
+    	case CREEP:
+    		// find the nearest storage structure
+    		VillageStructure storage = this.getVillage().getNearestStructure(VillageStructureType.STORAGE, this.getPosition());
+    		if (storage != null) {
+        		// get distance to nearest storage structure
+        		double distanceTo = storage.getItemFrame().getDistance(this);
+        		// check if near the storage structure
+        		if (distanceTo > (Village.VILLAGE_SIZE / 2))
+        			// not close to storage, so move a little faster
+    				return (0.30F + this.getLevel() * 0.02F) * movementMode.speedMultiplier;
+    		}
+    	default:
+    		break;
+    	}
+
+        return (0.20F + this.getLevel() * 0.02F) * movementMode.speedMultiplier;
     }
 
     public ItemStack getAquiredItem() {
@@ -333,7 +355,7 @@ public class EntityThief extends EntityEnemyBase implements IInventoryEntity, ID
 
             if (!this.getSeen()) {
                 this.setSeen(true);
-                this.addPotionEffect(new PotionEffect(MobEffects.GLOWING, 60));
+                this.addPotionEffect(new PotionEffect(MobEffects.GLOWING, 120));
                 this.village.sendChatMessage(TextUtils.translate("message.thief.seen"));
             }
         }
