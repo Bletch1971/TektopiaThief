@@ -1,27 +1,23 @@
 package bletch.tektopiathief.entities;
 
-import bletch.common.entities.ai.EntityAIUseDoor;
-import bletch.common.entities.ai.EntityAIUseGate;
+import bletch.common.MovementMode;
+import bletch.common.Interfaces.IDesireEntity;
+import bletch.common.Interfaces.IInventoryEntity;
+import bletch.common.core.CommonEntities;
+import bletch.common.entities.EntityEnemyBase;
+import bletch.common.storage.ItemDesire;
+import bletch.common.storage.ItemDesireSet;
+import bletch.common.storage.ModInventory;
 import bletch.common.utils.TextUtils;
 import bletch.tektopiathief.core.ModConfig;
 import bletch.tektopiathief.core.ModDetails;
-import bletch.tektopiathief.core.ModEntities;
 import bletch.tektopiathief.entities.ai.*;
 import bletch.tektopiathief.schedulers.ThiefScheduler;
-import bletch.tektopiathief.storage.ItemDesire;
-import bletch.tektopiathief.storage.ItemDesireSet;
-import bletch.tektopiathief.storage.ModInventory;
 import bletch.tektopiathief.utils.LoggerUtils;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import com.leviathanstudio.craftstudio.client.animation.ClientAnimationHandler;
-import com.leviathanstudio.craftstudio.common.animation.AnimationHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.entity.ai.EntityAISwimming;
-import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -35,80 +31,56 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntitySelectors;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import net.tangotek.tektopia.TekVillager;
 import net.tangotek.tektopia.Village;
 import net.tangotek.tektopia.VillagerRole;
-import net.tangotek.tektopia.entities.EntityVillageNavigator;
 import net.tangotek.tektopia.entities.EntityVillagerTek;
 import net.tangotek.tektopia.tickjob.TickJob;
 
 import java.util.Iterator;
-import java.util.Objects;
-import java.util.Set;
 
-public class EntityThief extends EntityVillageNavigator implements IMob {
+@SuppressWarnings("unchecked")
+public class EntityThief extends EntityEnemyBase implements IInventoryEntity, IDesireEntity {
 
     public static final String ENTITY_NAME = "thief";
     public static final String MODEL_NAME = "thief";
     public static final String RESOURCE_PATH = "thief";
     public static final String ANIMATION_MODEL_NAME = MODEL_NAME + "_m";
 
-    public static final Integer MIN_LEVEL = 1;
-    public static final Integer MAX_LEVEL = 5;
-
     public static long WORK_START_TIME = 16000L; // 22:00 (10:00 PM)
     public static long WORK_END_TIME = 23500L; // 05:30 (5:30 AM)
 
-    protected static final AnimationHandler<EntityThief> animationHandler;
-    protected static final DataParameter<String> ANIMATION_KEY;
     protected static final DataParameter<ItemStack> ACTION_ITEM;
-    protected static final DataParameter<Integer> LEVEL;
-    protected static final DataParameter<Byte> MOVEMENT_MODE;
     protected static final DataParameter<Boolean> SEEN;
 
-    private BlockPos firstCheck;
-    private MovementMode lastMovementMode;
-    private int idle;
     protected ModInventory inventory;
     protected ItemDesireSet desireSet;
 
     public EntityThief(World worldIn) {
-        super(worldIn, VillagerRole.ENEMY.value | VillagerRole.VISITOR.value);
+        super(worldIn, ModDetails.MOD_ID);
 
-        this.idle = 0;
         this.inventory = new ModInventory(this, "Items", false, 1);
-
-        this.setSize(0.6F, 1.95F);
-        this.setRotation(0.0F, 0.0F);
     }
 
     public EntityThief(World worldIn, int level) {
-        this(worldIn);
+    	super(worldIn, ModDetails.MOD_ID, level);
 
-        this.setLevel(level);
+        this.inventory = new ModInventory(this, "Items", false, 1);
     }
 
-    protected void addTask(int priority, EntityAIBase task) {
-        this.tasks.addTask(priority, task);
-    }
-
+    @Override
     protected void attachToVillage(Village village) {
         super.attachToVillage(village);
 
-        LoggerUtils.info("Attaching to village", true);
+        LoggerUtils.instance.info("Attaching to village", true);
     }
 
+    @Override
     public boolean attackEntityFrom(DamageSource source, float amount) {
         float beforeHealth = this.getHealth();
 
@@ -129,7 +101,7 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
                     }
                 }
 
-                LoggerUtils.info(message, true);
+                LoggerUtils.instance.info(message, true);
             }
 
             return true;
@@ -138,21 +110,23 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
         }
     }
 
+    @Override
     protected void checkStuck() {
         if (this.hasVillage() && this.firstCheck.distanceSq(this.getPosition()) < 10.0D) {
-            LoggerUtils.info("Killing self...failed to find a way to the village", true);
+            LoggerUtils.instance.info("Killing self...failed to find a way to the village", true);
             this.setDead();
         }
     }
 
+    @Override
     protected void detachVillage() {
         super.detachVillage();
 
-        LoggerUtils.info("Detaching from village", true);
+        LoggerUtils.instance.info("Detaching from village", true);
     }
 
     protected void dropAllItems(DamageSource cause) {
-        LoggerUtils.info("Dropping all items", true);
+        LoggerUtils.instance.info("Dropping all items", true);
 
         IInventory inventory = this.getInventory();
         Entity damagedBy = cause.getTrueSource();
@@ -170,7 +144,7 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
                     // only show the message if killed by a villager
                     this.village.sendChatMessage(message);
                 }
-                LoggerUtils.info(message, true);
+                LoggerUtils.instance.info(message, true);
 
                 this.entityDropItem(itemStack, 0.5f);
             }
@@ -187,12 +161,9 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
         return this.dataManager.get(ACTION_ITEM);
     }
 
+    @Override
     public float getAIMoveSpeed() {
         return (0.20F + this.getLevel() * 0.02F) * this.getMovementMode().speedMultiplier;
-    }
-
-    protected SoundEvent getAmbientSound() {
-        return null;
     }
 
     public ItemStack getAquiredItem() {
@@ -212,7 +183,7 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
         light = (Math.max(0, Math.min(15, light)) + 1) / 2;
         avoidDistance -= 8 - light;
 
-        LoggerUtils.info("EntityThief - getAvoidanceDistance called; avoidDistanceBase=" + this.getAvoidanceDistanceBase() + "; Level=" + this.getLevel() + "; light=" + light + "; avoidDistance=" + avoidDistance, true);
+        LoggerUtils.instance.info("EntityThief - getAvoidanceDistance called; avoidDistanceBase=" + this.getAvoidanceDistanceBase() + "; Level=" + this.getLevel() + "; light=" + light + "; avoidDistance=" + avoidDistance, true);
 
         return Math.max(1.0F, avoidDistance);
     }
@@ -221,11 +192,11 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
         return 24.0F;
     }
 
-    protected boolean getCanUseDoors() {
-        return true;
-    }
-
+    @Override
     public ItemDesireSet getDesireSet() {
+    	if (this.desireSet == null)
+    		this.setupDesires();
+    	
         return this.desireSet;
     }
 
@@ -233,11 +204,12 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
         float avoidDistance = this.getAvoidanceDistance();
         float detectDistance = avoidDistance - 5.0F;
 
-        LoggerUtils.info("EntityThief - getDetectionDistance called; avoidDistance=" + avoidDistance + "; detectDistance=" + detectDistance, true);
+        LoggerUtils.instance.info("EntityThief - getDetectionDistance called; avoidDistance=" + avoidDistance + "; detectDistance=" + detectDistance, true);
 
         return Math.max(1.0F, detectDistance);
     }
 
+    @Override
     public ITextComponent getDisplayName() {
         ITextComponent itextcomponent = new TextComponentTranslation("entity." + MODEL_NAME + ".name");
         itextcomponent.getStyle().setHoverEvent(this.getHoverEvent());
@@ -245,41 +217,23 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
         return itextcomponent;
     }
 
-    public int getIdle() {
-        return this.idle;
-    }
-
+    @Override
     public ModInventory getInventory() {
         return this.inventory;
-    }
-
-    public int getLevel() {
-        return this.dataManager.get(LEVEL);
-    }
-
-    public MovementMode getMovementMode() {
-        return MovementMode.valueOf(this.dataManager.get(MOVEMENT_MODE));
     }
 
     public Boolean getSeen() {
         return this.dataManager.get(SEEN);
     }
 
-    public SoundCategory getSoundCategory() {
-        return SoundCategory.HOSTILE;
-    }
-
-    public World getWorld() {
-        return this.world;
-    }
-
     public Boolean hasAcquiredItem() {
         return !this.inventory.hasSlotFree();
     }
 
+    @Override
     protected void initEntityAI() {
+    	setupAITasks();
         setupDesires();
-        setupAITasks();
     }
 
     public com.google.common.base.Predicate<Entity> isEnemy() {
@@ -292,18 +246,17 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
                 || e instanceof EntityVillagerTek && ((EntityVillagerTek) e).isRole(VillagerRole.VILLAGER);
     }
 
-    public boolean isMale() {
-        return this.getUniqueID().getLeastSignificantBits() % 2L == 0L;
-    }
-
+    @Override
     public boolean isStoragePriority() {
         return this.hasVillage() && this.isWorkTime() && !this.getSeen() && !this.hasAcquiredItem();
     }
 
+    @Override
     public boolean isWorkTime() {
         return isWorkTime(this.world, 0) && !this.world.isRaining();
     }
 
+    @Override
     public void onDeath(DamageSource cause) {
         super.onDeath(cause);
 
@@ -320,12 +273,13 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
                 }
             }
 
-            LoggerUtils.info(message, true);
+            LoggerUtils.instance.info(message, true);
 
             this.dropAllItems(cause);
         }
     }
 
+    @Override
     public void onInventoryUpdated(ItemStack updatedItem) {
         this.desireSet.onInventoryUpdated(this, updatedItem);
     }
@@ -334,17 +288,19 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
         this.desireSet.onStorageUpdated(this, storageItem);
     }
 
+    @Override
     public void onUpdate() {
         super.onUpdate();
 
         if (!this.world.isRemote && this.world.getDifficulty() == EnumDifficulty.PEACEFUL && !ModConfig.thief.thiefSpawnsWhenPeaceful) {
-            LoggerUtils.info("Killing self...difficulty is peaceful", true);
+            LoggerUtils.instance.info("Killing self...difficulty is peaceful", true);
             this.setDead();
         }
     }
 
-    private void prepStuck() {
-        this.firstCheck = this.getPosition();
+    @Override
+    public void pickupDesiredItem(ItemStack desiredItem) {
+        this.equipActionItem(desiredItem);
     }
 
     protected void scanForEnemies() {
@@ -355,7 +311,6 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
         if (detectionDistance == 0)
             return;
 
-        @SuppressWarnings("unchecked")
         Predicate<EntityLivingBase> entityPredicate = Predicates.and(EntitySelectors.CAN_AI_TARGET,
                 e -> e.isEntityAlive() && e.canEntityBeSeen(this),
                 this.isEnemy());
@@ -368,7 +323,7 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
         while (entityList.hasNext()) {
             EntityLivingBase entity = entityList.next();
 
-            LoggerUtils.info("EntityThief - scanForEnemies called, seen by entity"
+            LoggerUtils.instance.info("EntityThief - scanForEnemies called, seen by entity"
                             + "; entity=" + entity.getName()
                             + "; detection distance=" + detectionDistance
                             + "; distance=" + entity.getDistance(this)
@@ -384,43 +339,26 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
         }
     }
 
-    public void setIdle(int idle) {
-        this.idle = idle;
-    }
-
-    public void setLevel(int level) {
-        this.dataManager.set(LEVEL, Math.max(MIN_LEVEL, Math.min(level, MAX_LEVEL)));
-    }
-
-    public void setMovementMode(MovementMode mode) {
-        LoggerUtils.info("EntityThief - setMovementMode called; mode=" + mode.name(), true);
-
-        this.dataManager.set(MOVEMENT_MODE, mode.id);
-    }
-
     public void setSeen(Boolean seen) {
-        LoggerUtils.info("EntityThief - setSeen called; seen=" + seen, true);
+        LoggerUtils.instance.info("EntityThief - setSeen called; seen=" + seen, true);
 
         this.dataManager.set(SEEN, seen);
     }
 
+    @Override
     protected void setupAITasks() {
-        this.addTask(0, new EntityAISwimming(this));
+    	super.setupAITasks();
 
         this.addTask(1, new EntityAIFleeEntity(this,
                 (e) -> e.isWorkTime() && !e.getSeen() && !e.hasAcquiredItem(),
                 (e) -> this.isFleeFrom(e)));
-
-        this.addTask(15, new EntityAIUseDoor(this));
-
-        this.addTask(15, new EntityAIUseGate(this));
 
         this.addTask(30, new EntityAILeaveVillage(this,
                 (e) -> !e.isWorkTime() && !e.getSeen() && !e.hasAcquiredItem(),
                 (e) -> e.getVillage().getEdgeNode(),
                 MovementMode.WALK, null,
                 () -> {
-                    LoggerUtils.info("Killing Self...left the village", true);
+                    LoggerUtils.instance.info("Killing Self...left the village", true);
                     this.setDead();
                 }));
 
@@ -447,24 +385,23 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
                         }
 
                         this.village.sendChatMessage(message);
-                        LoggerUtils.info(message, true);
+                        LoggerUtils.instance.info(message, true);
                     } else if (this.getSeen()) {
                         String message = TextUtils.translate("message.thief.escapedseen");
 
                         this.village.sendChatMessage(message);
-                        LoggerUtils.info(message, true);
+                        LoggerUtils.instance.info(message, true);
                     }
 
-                    LoggerUtils.info("Killing Self...escaped the village", true);
+                    LoggerUtils.instance.info("Killing Self...escaped the village", true);
                     this.setDead();
                 }));
 
         this.addTask(50, new EntityAIRetrieveFromStorage(this));
-
-        this.addTask(150, new EntityAIIdleCheck(this));
     }
 
-    protected void setupDesires() {
+    @Override
+    public void setupDesires() {
         this.desireSet = new ItemDesireSet();
 
         // CROPS
@@ -536,6 +473,7 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
         this.desireSet.addItemDesire(new ItemDesire(Items.DIAMOND_BOOTS, 1, e -> e.getLevel() > 3));
     }
 
+    @Override
     protected void setupServerJobs() {
         super.setupServerJobs();
 
@@ -551,35 +489,11 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
         this.addJob(new TickJob(300, 100, true,
                 () -> {
                     if (!this.hasVillage() || !this.getVillage().isValid()) {
-                        LoggerUtils.info("Killing self...no village", true);
+                        LoggerUtils.instance.info("Killing self...no village", true);
                         this.setDead();
                     }
                 }
         ));
-    }
-
-    @SideOnly(Side.CLIENT)
-    protected void startWalking() {
-        MovementMode mode = this.getMovementMode();
-
-        if (mode != this.lastMovementMode) {
-            if (this.lastMovementMode != null) {
-                this.stopWalking();
-            }
-
-            this.lastMovementMode = mode;
-            if (mode != null) {
-                this.playClientAnimation(mode.animation);
-            }
-        }
-    }
-
-    @SideOnly(Side.CLIENT)
-    protected void stopWalking() {
-        if (this.lastMovementMode != null) {
-            this.stopClientAnimation(this.lastMovementMode.animation);
-            this.lastMovementMode = null;
-        }
     }
 
     public void unequipActionItem() {
@@ -592,11 +506,10 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
         }
     }
 
+    @Override
     public void readEntityFromNBT(NBTTagCompound compound) {
         super.readEntityFromNBT(compound);
 
-        if (compound.hasKey("level"))
-            this.setLevel(compound.getInteger("level"));
         if (compound.hasKey("seen"))
             this.setSeen(compound.getBoolean("seen"));
 
@@ -604,141 +517,45 @@ public class EntityThief extends EntityVillageNavigator implements IMob {
         this.getDesireSet().forceUpdate();
     }
 
+    @Override
     public void writeEntityToNBT(NBTTagCompound compound) {
         super.writeEntityToNBT(compound);
 
-        compound.setInteger("level", this.getLevel());
         compound.setBoolean("seen", this.getSeen());
 
         this.inventory.writeNBT(compound);
     }
 
     static {
-        ANIMATION_KEY = EntityDataManager.createKey(EntityThief.class, DataSerializers.STRING);
         ACTION_ITEM = EntityDataManager.createKey(EntityThief.class, DataSerializers.ITEM_STACK);
-        LEVEL = EntityDataManager.createKey(EntityThief.class, DataSerializers.VARINT);
-        MOVEMENT_MODE = EntityDataManager.createKey(EntityThief.class, DataSerializers.BYTE);
         SEEN = EntityDataManager.createKey(EntityThief.class, DataSerializers.BOOLEAN);
 
-        animationHandler = TekVillager.getNewAnimationHandler(EntityThief.class);
-        setupCraftStudioAnimations(animationHandler, ANIMATION_MODEL_NAME);
+        setupCraftStudioAnimations(ModDetails.MOD_ID, ANIMATION_MODEL_NAME);
+    }
+
+    protected static void setupCraftStudioAnimations(String modId, String modelName) {
+    	EntityEnemyBase.setupCraftStudioAnimations(modId, modelName);
+    	
+        animationHandler.addAnim(modId, CommonEntities.ANIMATION_VILLAGER_CREEP, modelName, true);
     }
 
     public static boolean isWorkTime(World world, int sleepOffset) {
         return Village.isTimeOfDay(world, WORK_START_TIME, WORK_END_TIME, sleepOffset);
     }
 
-    protected static void setupCraftStudioAnimations(AnimationHandler<EntityThief> animationHandler, String modelName) {
-        animationHandler.addAnim(ModDetails.MOD_ID, ModEntities.ANIMATION_VILLAGER_WALK, modelName, true);
-        animationHandler.addAnim(ModDetails.MOD_ID, ModEntities.ANIMATION_VILLAGER_RUN, modelName, true);
-        animationHandler.addAnim(ModDetails.MOD_ID, ModEntities.ANIMATION_VILLAGER_CREEP, modelName, true);
-    }
-
-    @Override
-    public AnimationHandler<EntityThief> getAnimationHandler() {
-        return animationHandler;
-    }
-
-    @Override
-    public void playClientAnimation(String animationName) {
-        if (!this.getAnimationHandler().isAnimationActive(ModDetails.MOD_ID, animationName, this)) {
-            this.getAnimationHandler().startAnimation(ModDetails.MOD_ID, animationName, this);
-        }
-    }
-
-    @Override
-    public void stopClientAnimation(String animationName) {
-        super.stopClientAnimation(animationName);
-
-        if (this.getAnimationHandler().isAnimationActive(ModDetails.MOD_ID, animationName, this)) {
-            this.getAnimationHandler().stopAnimation(ModDetails.MOD_ID, animationName, this);
-        }
-    }
-
     @Override
     protected void applyEntityAttributes() {
         super.applyEntityAttributes();
 
-        this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(20.0D);
-        this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(64.0D);
-        this.dataManager.set(ANIMATION_KEY, "");
         this.dataManager.set(ACTION_ITEM, ItemStack.EMPTY);
-        this.dataManager.set(MOVEMENT_MODE, MovementMode.WALK.id);
     }
 
     @Override
     protected void entityInit() {
-        this.dataManager.register(ANIMATION_KEY, "");
         this.dataManager.register(ACTION_ITEM, ItemStack.EMPTY);
-        this.dataManager.register(LEVEL, 1);
-        this.dataManager.register(MOVEMENT_MODE, (byte) 0);
         this.dataManager.register(SEEN, false);
 
         super.entityInit();
     }
-
-    protected void updateClientAnimation(String animationName) {
-        ClientAnimationHandler<EntityThief> clientAnimationHandler = (ClientAnimationHandler<EntityThief>) this.getAnimationHandler();
-
-        Set<String> animChannels = clientAnimationHandler.getAnimChannels().keySet();
-        animChannels.forEach(a -> clientAnimationHandler.stopAnimation(a, this));
-
-        if (!animationName.isEmpty()) {
-            clientAnimationHandler.startAnimation(ModDetails.MOD_ID, animationName, this);
-        }
-    }
-
-    @Override
-    public void notifyDataManagerChange(DataParameter<?> key) {
-        super.notifyDataManagerChange(key);
-
-        if (this.isWorldRemote() && ANIMATION_KEY.equals(key)) {
-            this.updateClientAnimation(this.dataManager.get(ANIMATION_KEY));
-        }
-
-        if (MOVEMENT_MODE.equals(key) && this.isWalking()) {
-            this.startWalking();
-        }
-    }
-
-    @Override
-    public void stopServerAnimation(String animationName) {
-        this.dataManager.set(ANIMATION_KEY, "");
-    }
-
-    @Override
-    public void playServerAnimation(String animationName) {
-        this.dataManager.set(ANIMATION_KEY, animationName);
-    }
-
-    @Override
-    public boolean isPlayingAnimation(String animationName) {
-        return Objects.equals(animationName, this.dataManager.get(ANIMATION_KEY));
-    }
-
-    public enum MovementMode {
-        WALK((byte) 1, 1.0F, ModEntities.ANIMATION_VILLAGER_WALK),
-        RUN((byte) 2, 1.4F, ModEntities.ANIMATION_VILLAGER_RUN),
-        CREEP((byte) 3, 0.8F, ModEntities.ANIMATION_VILLAGER_CREEP);
-
-        public byte id;
-        public float speedMultiplier;
-        public String animation;
-
-        MovementMode(byte id, float speedMultiplier, String animation) {
-            this.id = id;
-            this.speedMultiplier = speedMultiplier;
-            this.animation = animation;
-        }
-
-        public static MovementMode valueOf(byte id) {
-            for (MovementMode mode : values()) {
-                if (mode.id == id) {
-                    return mode;
-                }
-            }
-
-            return null;
-        }
-    }
+    
 }

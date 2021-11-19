@@ -1,8 +1,8 @@
 package bletch.tektopiathief.entities.ai;
 
+import bletch.common.MovementMode;
 import bletch.common.entities.ai.EntityAIMoveToBlock;
 import bletch.tektopiathief.entities.EntityThief;
-import bletch.tektopiathief.entities.EntityThief.MovementMode;
 import bletch.tektopiathief.utils.LoggerUtils;
 import net.minecraft.util.math.BlockPos;
 
@@ -34,7 +34,7 @@ public class EntityAILeaveVillage extends EntityAIMoveToBlock {
     }
 
     public void startExecuting() {
-        LoggerUtils.info("EntityAILeaveVillage - startExecuting called", true);
+        LoggerUtils.instance.info("EntityAILeaveVillage - startExecuting called", true);
 
         if (this.startRunner != null) {
             this.startRunner.run();
@@ -44,7 +44,7 @@ public class EntityAILeaveVillage extends EntityAIMoveToBlock {
     }
 
     public void resetTask() {
-        LoggerUtils.info("EntityAILeaveVillage - resetTask called", true);
+        LoggerUtils.instance.info("EntityAILeaveVillage - resetTask called", true);
 
         if (this.resetRunner != null) {
             this.resetRunner.run();
@@ -62,7 +62,7 @@ public class EntityAILeaveVillage extends EntityAIMoveToBlock {
     }
 
     protected void updateMovementMode() {
-        LoggerUtils.info("EntityAILeaveVillage - updateMovementMode called with mode " + this.moveMode.name(), true);
+        LoggerUtils.instance.info("EntityAILeaveVillage - updateMovementMode called with mode " + this.moveMode.name(), true);
 
         this.entity.setMovementMode(this.moveMode);
     }

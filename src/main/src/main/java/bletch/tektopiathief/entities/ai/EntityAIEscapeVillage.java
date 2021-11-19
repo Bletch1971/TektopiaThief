@@ -1,8 +1,8 @@
 package bletch.tektopiathief.entities.ai;
 
+import bletch.common.MovementMode;
 import bletch.common.entities.ai.EntityAIMoveToBlock;
 import bletch.tektopiathief.entities.EntityThief;
-import bletch.tektopiathief.entities.EntityThief.MovementMode;
 import bletch.tektopiathief.utils.LoggerUtils;
 import net.minecraft.util.math.BlockPos;
 
@@ -35,7 +35,7 @@ public class EntityAIEscapeVillage extends EntityAIMoveToBlock {
     }
 
     public void startExecuting() {
-        LoggerUtils.info("EntityAIEscapeVillage - startExecuting called", true);
+        LoggerUtils.instance.info("EntityAIEscapeVillage - startExecuting called", true);
 
         this.active = true;
         if (this.startRunner != null) {
@@ -48,12 +48,12 @@ public class EntityAIEscapeVillage extends EntityAIMoveToBlock {
     public boolean shouldContinueExecuting() {
         boolean result = this.active && this.navigator.canNavigate();
         if (!result)
-            LoggerUtils.info("EntityAIEscapeVillage - shouldContinueExecuting called; this.active=" + this.active + "; this.arrived=" + this.arrived + "; this.stuck=" + this.stuck + " (" + this.stuckCount + "); canNavigate=" + this.navigator.canNavigate(), true);
+            LoggerUtils.instance.info("EntityAIEscapeVillage - shouldContinueExecuting called; this.active=" + this.active + "; this.arrived=" + this.arrived + "; this.stuck=" + this.stuck + " (" + this.stuckCount + "); canNavigate=" + this.navigator.canNavigate(), true);
         return result;
     }
 
     public void resetTask() {
-        LoggerUtils.info("EntityAIEscapeVillage - resetTask called", true);
+        LoggerUtils.instance.info("EntityAIEscapeVillage - resetTask called", true);
 
         if (this.resetRunner != null) {
             this.resetRunner.run();
@@ -76,28 +76,28 @@ public class EntityAIEscapeVillage extends EntityAIMoveToBlock {
     }
 
     protected void onArrival() {
-        LoggerUtils.info("EntityAIEscapeVillage - onArrival called", true);
+        LoggerUtils.instance.info("EntityAIEscapeVillage - onArrival called", true);
 
         this.active = false;
         super.onArrival();
     }
 
     protected void onPathFailed(BlockPos pos) {
-        LoggerUtils.info("EntityAIEscapeVillage - onPathFailed called", true);
+        LoggerUtils.instance.info("EntityAIEscapeVillage - onPathFailed called", true);
 
         this.active = false;
         super.onPathFailed(pos);
     }
 
     protected void onStuck() {
-        LoggerUtils.info("EntityAIEscapeVillage - onStuck called", true);
+        LoggerUtils.instance.info("EntityAIEscapeVillage - onStuck called", true);
 
         this.active = false;
         super.onStuck();
     }
 
     protected void updateMovementMode() {
-        LoggerUtils.info("EntityAIEscapeVillage - updateMovementMode called with mode " + this.moveMode.name(), true);
+        LoggerUtils.instance.info("EntityAIEscapeVillage - updateMovementMode called with mode " + this.moveMode.name(), true);
 
         this.entity.setMovementMode(this.moveMode);
     }

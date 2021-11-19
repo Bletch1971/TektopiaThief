@@ -1,8 +1,8 @@
 package bletch.tektopiathief.entities.ai;
 
+import bletch.common.MovementMode;
 import bletch.common.entities.ai.EntityAIMoveToBlock;
 import bletch.tektopiathief.entities.EntityThief;
-import bletch.tektopiathief.entities.EntityThief.MovementMode;
 import bletch.tektopiathief.utils.LoggerUtils;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
@@ -56,7 +56,7 @@ public class EntityAIFleeEntity extends EntityAIMoveToBlock {
                 return false;
 
             this.fleeEntity = fleeEntities.get(0);
-            LoggerUtils.info("EntityAIFleeEntity - shouldExecute called"
+            LoggerUtils.instance.info("EntityAIFleeEntity - shouldExecute called"
                             + "; entity=" + this.fleeEntity.getName()
                             + "; avoid Distance=" + avoidDistance
                             + "; distance=" + this.fleeEntity.getDistance(this.entity)
@@ -74,7 +74,7 @@ public class EntityAIFleeEntity extends EntityAIMoveToBlock {
     }
 
     public void startExecuting() {
-        LoggerUtils.info("EntityAIFleeEntity - startExecuting called", true);
+        LoggerUtils.instance.info("EntityAIFleeEntity - startExecuting called", true);
 
         if (this.entityPredicate.test(this.fleeEntity)) {
             if (this.entity.getRNG().nextInt(2) == 0) {
@@ -86,7 +86,7 @@ public class EntityAIFleeEntity extends EntityAIMoveToBlock {
     }
 
     public void resetTask() {
-        LoggerUtils.info("EntityAIFleeEntity - resetTask called", true);
+        LoggerUtils.instance.info("EntityAIFleeEntity - resetTask called", true);
 
         this.fleeEntity = null;
 
@@ -138,7 +138,7 @@ public class EntityAIFleeEntity extends EntityAIMoveToBlock {
     }
 
     protected void updateMovementMode() {
-        LoggerUtils.info("EntityAIFleeEntity - updateMovementMode called with mode " + this.moveMode.name(), true);
+        LoggerUtils.instance.info("EntityAIFleeEntity - updateMovementMode called with mode " + this.moveMode.name(), true);
 
         this.entity.setMovementMode(this.moveMode);
     }

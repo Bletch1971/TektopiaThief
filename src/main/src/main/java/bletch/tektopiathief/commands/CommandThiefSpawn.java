@@ -58,13 +58,13 @@ public class CommandThiefSpawn extends CommonCommandBase {
 
         if (world == null || world.isRaining()) {
             notifyCommandListener(sender, this, this.prefix + COMMAND_NAME + ".badconditions");
-            LoggerUtils.info(TextUtils.translate(this.prefix + COMMAND_NAME + ".badconditions"), true);
+            LoggerUtils.instance.info(TextUtils.translate(this.prefix + COMMAND_NAME + ".badconditions"), true);
             return;
         }
 
         if (world.getDifficulty() == EnumDifficulty.PEACEFUL && !ModConfig.thief.thiefSpawnsWhenPeaceful) {
             notifyCommandListener(sender, this, this.prefix + COMMAND_NAME + ".peaceful");
-            LoggerUtils.info(TextUtils.translate(this.prefix + COMMAND_NAME + ".peaceful"), true);
+            LoggerUtils.instance.info(TextUtils.translate(this.prefix + COMMAND_NAME + ".peaceful"), true);
             return;
         }
 
@@ -72,7 +72,7 @@ public class CommandThiefSpawn extends CommonCommandBase {
         Village village = villageManager != null && entityPlayer != null ? villageManager.getVillageAt(entityPlayer.getPosition()) : null;
         if (village == null) {
             notifyCommandListener(sender, this, this.prefix + COMMAND_NAME + ".novillage");
-            LoggerUtils.info(TextUtils.translate(this.prefix + COMMAND_NAME + ".novillage"), true);
+            LoggerUtils.instance.info(TextUtils.translate(this.prefix + COMMAND_NAME + ".novillage"), true);
             return;
         }
 
@@ -80,26 +80,26 @@ public class CommandThiefSpawn extends CommonCommandBase {
 
         if (spawnPosition == null) {
             notifyCommandListener(sender, this, this.prefix + COMMAND_NAME + ".noposition");
-            LoggerUtils.info(TextUtils.translate(this.prefix + COMMAND_NAME + ".noposition"), true);
+            LoggerUtils.instance.info(TextUtils.translate(this.prefix + COMMAND_NAME + ".noposition"), true);
             return;
         }
 
         List<EntityThief> entityList = world.getEntitiesWithinAABB(EntityThief.class, village.getAABB().grow(Village.VILLAGE_SIZE));
         if (entityList.size() > 0) {
             notifyCommandListener(sender, this, this.prefix + COMMAND_NAME + ".exists");
-            LoggerUtils.info(TextUtils.translate(this.prefix + COMMAND_NAME + ".exists"), true);
+            LoggerUtils.instance.info(TextUtils.translate(this.prefix + COMMAND_NAME + ".exists"), true);
             return;
         }
 
         // attempt to spawn the thief
         if (!TektopiaUtils.trySpawnPersistenceEntity(world, spawnPosition, (World w) -> new EntityThief(w, level))) {
             notifyCommandListener(sender, this, this.prefix + COMMAND_NAME + ".failed");
-            LoggerUtils.info(TextUtils.translate(this.prefix + COMMAND_NAME + ".failed"), true);
+            LoggerUtils.instance.info(TextUtils.translate(this.prefix + COMMAND_NAME + ".failed"), true);
             return;
         }
 
         notifyCommandListener(sender, this, this.prefix + COMMAND_NAME + ".success", TektopiaUtils.formatBlockPos(spawnPosition));
-        LoggerUtils.info(TextUtils.translate(this.prefix + COMMAND_NAME + ".success", TektopiaUtils.formatBlockPos(spawnPosition)), true);
+        LoggerUtils.instance.info(TextUtils.translate(this.prefix + COMMAND_NAME + ".success", TektopiaUtils.formatBlockPos(spawnPosition)), true);
     }
 
 }

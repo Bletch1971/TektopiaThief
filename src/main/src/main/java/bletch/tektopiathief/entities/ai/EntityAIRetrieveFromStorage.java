@@ -1,9 +1,9 @@
 package bletch.tektopiathief.entities.ai;
 
+import bletch.common.MovementMode;
 import bletch.common.entities.ai.EntityAIMoveToBlock;
+import bletch.common.storage.ItemDesire;
 import bletch.tektopiathief.entities.EntityThief;
-import bletch.tektopiathief.entities.EntityThief.MovementMode;
-import bletch.tektopiathief.storage.ItemDesire;
 import bletch.tektopiathief.utils.LoggerUtils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -164,15 +164,15 @@ public class EntityAIRetrieveFromStorage extends EntityAIMoveToBlock {
         boolean acquired = !this.entity.getInventory().addItem(itemStack).isEmpty();
         if (acquired) {
             String aquiredItemDescription = itemStack.getDisplayName() + " x " + itemStack.getCount();
-            LoggerUtils.info("EntityAIRetrieveFromStorage - itemAcquired called; acquired=" + aquiredItemDescription, true);
+            LoggerUtils.instance.info("EntityAIRetrieveFromStorage - itemAcquired called; acquired=" + aquiredItemDescription, true);
         } else {
-            LoggerUtils.info("EntityAIRetrieveFromStorage - itemAcquired called; acquire failed", true);
+            LoggerUtils.instance.info("EntityAIRetrieveFromStorage - itemAcquired called; acquire failed", true);
         }
         return acquired;
     }
 
     protected void updateMovementMode() {
-        LoggerUtils.info("EntityAIRetrieveFromStorage - updateMovementMode called with mode " + this.moveMode.name(), true);
+        LoggerUtils.instance.info("EntityAIRetrieveFromStorage - updateMovementMode called with mode " + this.moveMode.name(), true);
 
         this.entity.setMovementMode(this.moveMode);
     }

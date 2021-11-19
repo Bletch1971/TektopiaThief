@@ -30,7 +30,7 @@ public class ThiefScheduler implements IScheduler {
         if (this.resetDay)
             return;
 
-        LoggerUtils.info("ThiefScheduler - resetDay called", true);
+        LoggerUtils.instance.info("ThiefScheduler - resetDay called", true);
 
         // if it is day time, then clear the village checks
         this.checkedVillages = false;
@@ -49,13 +49,13 @@ public class ThiefScheduler implements IScheduler {
         if (this.checkedVillages || world == null || world.isRaining() || !EntityThief.isWorkTime(world, 0))
             return;
 
-        LoggerUtils.info("ThiefScheduler - update called", true);
+        LoggerUtils.instance.info("ThiefScheduler - update called", true);
 
         this.resetDay = false;
         this.checkedVillages = true;
 
         if (world.getDifficulty() == EnumDifficulty.PEACEFUL && !ModConfig.thief.thiefSpawnsWhenPeaceful) {
-            LoggerUtils.info(TextUtils.translate("message.thief.peaceful"), true);
+            LoggerUtils.instance.info(TextUtils.translate("message.thief.peaceful"), true);
             return;
         }
 
@@ -71,7 +71,7 @@ public class ThiefScheduler implements IScheduler {
 
             int gracePeriod = getGracePeriod(v);
             if (gracePeriod > 0) {
-                LoggerUtils.info(TextUtils.translate("message.thief.graceperiod", villageName), true);
+                LoggerUtils.instance.info(TextUtils.translate("message.thief.graceperiod", villageName), true);
                 return;
             }
 
@@ -79,7 +79,7 @@ public class ThiefScheduler implements IScheduler {
             if (storage != null) {
                 EntityItemFrame frame = storage.getItemFrame();
                 if (frame != null && frame.getRotation() != 0) {
-                    LoggerUtils.info(TextUtils.translate("message.thief.spawnblocked", villageName), true);
+                    LoggerUtils.instance.info(TextUtils.translate("message.thief.spawnblocked", villageName), true);
                     return;
                 }
             }
@@ -90,7 +90,7 @@ public class ThiefScheduler implements IScheduler {
 
             if (villageLevel > 0 && villageCheck == 0) {
 
-                LoggerUtils.info(TextUtils.translate("message.thief.villagechecksuccess", villageName, villageLevel, villageCheck), true);
+                LoggerUtils.instance.info(TextUtils.translate("message.thief.villagechecksuccess", villageName, villageLevel, villageCheck), true);
 
                 // get a list of the Thieves in the village
                 List<EntityThief> entityList = world.getEntitiesWithinAABB(EntityThief.class, v.getAABB().grow(Village.VILLAGE_SIZE));
@@ -100,17 +100,17 @@ public class ThiefScheduler implements IScheduler {
 
                     // attempt spawn
                     if (TektopiaUtils.trySpawnPersistenceEntity(world, spawnPosition, (World w) -> new EntityThief(w, villageLevel))) {
-                        LoggerUtils.info(TextUtils.translate("message.thief.spawned.village", villageLevel, villageName, TektopiaUtils.formatBlockPos(spawnPosition)), true);
+                        LoggerUtils.instance.info(TextUtils.translate("message.thief.spawned.village", villageLevel, villageName, TektopiaUtils.formatBlockPos(spawnPosition)), true);
                     } else {
-                        LoggerUtils.info(TextUtils.translate("message.thief.noposition.village", villageName), true);
+                        LoggerUtils.instance.info(TextUtils.translate("message.thief.noposition.village", villageName), true);
                     }
 
                 } else {
-                    LoggerUtils.info(TextUtils.translate("message.thief.exists", villageName), true);
+                    LoggerUtils.instance.info(TextUtils.translate("message.thief.exists", villageName), true);
                 }
 
             } else {
-                LoggerUtils.info(TextUtils.translate("message.thief.villagecheckfailed", villageName, villageLevel, villageCheck), true);
+                LoggerUtils.instance.info(TextUtils.translate("message.thief.villagecheckfailed", villageName, villageLevel, villageCheck), true);
             }
         });
     }
