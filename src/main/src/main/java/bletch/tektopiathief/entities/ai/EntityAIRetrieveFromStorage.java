@@ -30,7 +30,7 @@ public class EntityAIRetrieveFromStorage extends EntityAIMoveToBlock {
     public boolean shouldExecute() {
         if ((this.entity.isAITick() || this.entity.isStoragePriority()) && this.entity.hasVillage()) {
             this.autoCheck = false;
-            this.retrieveDesire = this.entity.getDesireSet().getNeededDesire(this.entity);
+            this.retrieveDesire = this.entity.getDesireSet().getNeededDesire(this.entity); 
 
             if (this.retrieveDesire != null) {
                 this.chest = this.retrieveDesire.getPickUpChest(this.entity);
@@ -161,7 +161,7 @@ public class EntityAIRetrieveFromStorage extends EntityAIMoveToBlock {
         this.autoCheck = true;
         this.entity.setStoragePriority();
 
-        boolean acquired = !this.entity.getInventory().addItem(itemStack).isEmpty();
+        boolean acquired = this.entity.getInventory().addItem(itemStack).isEmpty();
         if (acquired) {
             String aquiredItemDescription = itemStack.getDisplayName() + " x " + itemStack.getCount();
             LoggerUtils.instance.info("EntityAIRetrieveFromStorage - itemAcquired called; acquired=" + aquiredItemDescription, true);

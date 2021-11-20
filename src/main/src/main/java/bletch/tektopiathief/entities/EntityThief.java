@@ -457,10 +457,12 @@ public class EntityThief extends EntityEnemyBase implements IInventoryEntity, ID
         // RESOURCES
         this.desireSet.addItemDesire(new ItemDesire(Items.COAL, 5, null));
         this.desireSet.addItemDesire(new ItemDesire(Items.DIAMOND, 1, e -> e.getLevel() > 3));
+        this.desireSet.addItemDesire(new ItemDesire(Items.FEATHER, 5, null));
         this.desireSet.addItemDesire(new ItemDesire(Blocks.GOLD_ORE, 2, e -> !e.isMale()));
         this.desireSet.addItemDesire(new ItemDesire(Items.GOLD_INGOT, 2, e -> !e.isMale()));
         this.desireSet.addItemDesire(new ItemDesire(Blocks.IRON_ORE, 2, e -> e.isMale()));
         this.desireSet.addItemDesire(new ItemDesire(Items.IRON_INGOT, 2, e -> e.isMale()));
+        this.desireSet.addItemDesire(new ItemDesire(Items.LEATHER, 4, null));
         this.desireSet.addItemDesire(new ItemDesire(Blocks.LOG, 3, null));
         this.desireSet.addItemDesire(new ItemDesire(Items.REDSTONE, 5, e -> e.getLevel() > 2));
         this.desireSet.addItemDesire(new ItemDesire(Blocks.WOOL, 2, null));
