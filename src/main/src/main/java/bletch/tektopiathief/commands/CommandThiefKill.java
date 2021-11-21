@@ -1,10 +1,10 @@
 package bletch.tektopiathief.commands;
 
-import java.util.List;
-
+import bletch.common.commands.CommonCommandBase;
+import bletch.common.utils.TextUtils;
+import bletch.tektopiathief.core.ModDetails;
 import bletch.tektopiathief.entities.EntityThief;
 import bletch.tektopiathief.utils.LoggerUtils;
-import bletch.tektopiathief.utils.TextUtils;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
@@ -14,47 +14,49 @@ import net.minecraft.world.World;
 import net.tangotek.tektopia.Village;
 import net.tangotek.tektopia.VillageManager;
 
-public class CommandThiefKill extends CommandThiefBase {
+import java.util.List;
 
-	private static final String COMMAND_NAME = "kill";
-	
-	public CommandThiefKill() {
-		super(COMMAND_NAME);
-	}
+public class CommandThiefKill extends CommonCommandBase {
 
-	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-		if (args.length > 0) {
-			throw new WrongUsageException(ThiefCommands.COMMAND_PREFIX + COMMAND_NAME + ".usage", new Object[0]);
-		} 
-		
-		EntityPlayer entityPlayer = super.getCommandSenderAsPlayer(sender);
-		World world = entityPlayer != null ? entityPlayer.getEntityWorld() : null;
-		
-		VillageManager villageManager = world != null ? VillageManager.get(world) : null;
-		Village village = villageManager != null && entityPlayer != null ? villageManager.getVillageAt(entityPlayer.getPosition()) : null;
-		if (village == null) {
-			notifyCommandListener(sender, this, ThiefCommands.COMMAND_PREFIX + COMMAND_NAME + ".novillage", new Object[0]);
-			LoggerUtils.info(TextUtils.translate(ThiefCommands.COMMAND_PREFIX + COMMAND_NAME + ".novillage", new Object[0]), true);
-			return;
-		}
+    private static final String COMMAND_NAME = "kill";
+
+    public CommandThiefKill() {
+        super(ModDetails.MOD_ID, ThiefCommands.COMMAND_PREFIX, COMMAND_NAME);
+    }
+
+    @Override
+    public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+        if (args.length > 0) {
+            throw new WrongUsageException(this.prefix + COMMAND_NAME + ".usage");
+        }
+
+        EntityPlayer entityPlayer = getCommandSenderAsPlayer(sender);
+        World world = entityPlayer != null ? entityPlayer.getEntityWorld() : null;
+
+        VillageManager villageManager = world != null ? VillageManager.get(world) : null;
+        Village village = villageManager != null && entityPlayer != null ? villageManager.getVillageAt(entityPlayer.getPosition()) : null;
+        if (village == null) {
+            notifyCommandListener(sender, this, this.prefix + COMMAND_NAME + ".novillage");
+            LoggerUtils.instance.info(TextUtils.translate(this.prefix + COMMAND_NAME + ".novillage"), true);
+            return;
+        }
 
         List<EntityThief> entityList = world.getEntitiesWithinAABB(EntityThief.class, village.getAABB().grow(Village.VILLAGE_SIZE));
         if (entityList.size() == 0) {
-			notifyCommandListener(sender, this, ThiefCommands.COMMAND_PREFIX + COMMAND_NAME + ".noexists", new Object[0]);
-			LoggerUtils.info(TextUtils.translate(ThiefCommands.COMMAND_PREFIX + COMMAND_NAME + ".noexists", new Object[0]), true);
-			return;
+            notifyCommandListener(sender, this, this.prefix + COMMAND_NAME + ".noexists");
+            LoggerUtils.instance.info(TextUtils.translate(this.prefix + COMMAND_NAME + ".noexists"), true);
+            return;
         }
-        
+
         for (EntityThief entity : entityList) {
-        	if (entity.isDead)
-        		continue;
-        	
-        	entity.setDead();
-    		
-    		notifyCommandListener(sender, this, ThiefCommands.COMMAND_PREFIX + COMMAND_NAME + ".success", new Object[0]);
-    		LoggerUtils.info(TextUtils.translate(ThiefCommands.COMMAND_PREFIX + COMMAND_NAME + ".success", new Object[0]), true);
+            if (entity.isDead)
+                continue;
+
+            entity.setDead();
+
+            notifyCommandListener(sender, this, this.prefix + COMMAND_NAME + ".success");
+            LoggerUtils.instance.info(TextUtils.translate(this.prefix + COMMAND_NAME + ".success"), true);
         }
-	}
-    
+    }
+
 }
