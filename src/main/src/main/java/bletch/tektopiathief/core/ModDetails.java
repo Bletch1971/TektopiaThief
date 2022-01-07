@@ -8,7 +8,7 @@ import bletch.common.core.CommonDetails;
 public class ModDetails extends CommonDetails {
     private static final int VersionMajor = 1;
     private static final int VersionMinor = 2;
-    private static final int VersionRevision = 0;
+    private static final int VersionRevision = 1;
 
     public static final String MOD_ID = "tektopiathief";
     public static final String MOD_NAME = "TektopiaThief";
