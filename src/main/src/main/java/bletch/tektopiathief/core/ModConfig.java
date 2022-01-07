@@ -52,6 +52,11 @@ public class ModConfig {
         @Config.LangKey("config.thief.thiefdetectsplayer")
         public Boolean thiefdetectsplayer = false;
 
+        @Config.Comment("The number of days before the thief visits the village again after they were successful. Set the 0 to disable to grace period. Default: 2")
+        @Config.LangKey("config.thief.thiefgraceperiod")
+        @Config.RangeInt(min = 0, max = 365)
+        public int thiefgraceperiod = 2;
+
     }
 
 }

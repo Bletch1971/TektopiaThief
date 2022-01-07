@@ -397,7 +397,7 @@ public class EntityThief extends EntityEnemyBase implements IInventoryEntity, ID
                         ItemStack aquiredItem = this.getAquiredItem();
 
                         if (aquiredItem != null && !aquiredItem.isEmpty()) {
-                            ThiefScheduler.setGracePeriod(this.village, 2);
+                            ThiefScheduler.resetGracePeriod(this.village);
 
                             String aquiredItemDescription = aquiredItem.getDisplayName();
                             if (aquiredItem.getCount() > 1) {

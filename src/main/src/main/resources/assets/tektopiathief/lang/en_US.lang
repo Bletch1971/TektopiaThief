@@ -53,7 +53,8 @@ config.thief.thiefspawnswhenpeaceful=Thief Spawns on Peaceful Difficulty
 config.thief.thiefspawnswhenpeaceful.tooltop=If enabled, the Thief will spawn even if the difficulty is set to Peaceful.
 config.thief.thiefdetectsplayer=Thief Detects Players
 config.thief.thiefdetectsplayer.tooltop=If enabled, the Thief will detect players and flee from them.
-
+config.thief.thiefgraceperiod=Thief Grace Period
+config.thief.thiefgraceperiod.tooltip=The number of days before the thief visits the village again after they were successful. Set the 0 to disable to grace period.
 
 #============
 #= Commands =

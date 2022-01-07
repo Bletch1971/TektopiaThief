@@ -14,6 +14,7 @@ import net.tangotek.tektopia.Village;
 import net.tangotek.tektopia.structures.VillageStructure;
 import net.tangotek.tektopia.structures.VillageStructureType;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -120,7 +121,18 @@ public class ThiefScheduler implements IScheduler {
     }
 
     public static void reduceGracePeriods() {
-        gracePeriods.forEach((v, p) -> setGracePeriod(v, p - 1));
+    	List<Village> villages = new ArrayList<Village>(gracePeriods.keySet());
+    	
+    	for (int index = villages.size() - 1; index >= 0; index--) {
+    		setGracePeriod(villages.get(index), gracePeriods.getOrDefault(villages.get(index), 0) - 1);
+    	}
+    }
+
+    public static void resetGracePeriod(Village village) {
+        if (village == null)
+            return;
+
+        setGracePeriod(village, ModConfig.thief.thiefgraceperiod);
     }
 
     public static void setGracePeriod(Village village, int gracePeriod) {
