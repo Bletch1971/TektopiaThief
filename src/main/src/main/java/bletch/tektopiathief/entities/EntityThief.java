@@ -171,15 +171,18 @@ public class EntityThief extends EntityEnemyBase implements IInventoryEntity, ID
     	
     	switch (movementMode) {
     	case CREEP:
-    		// find the nearest storage structure
-    		VillageStructure storage = this.getVillage().getNearestStructure(VillageStructureType.STORAGE, this.getPosition());
-    		if (storage != null) {
-        		// get distance to nearest storage structure
-        		double distanceTo = storage.getItemFrame().getDistance(this);
-        		// check if near the storage structure
-        		if (distanceTo > (Village.VILLAGE_SIZE / 2))
-        			// not close to storage, so move a little faster
-    				return (0.30F + this.getLevel() * 0.02F) * movementMode.speedMultiplier;
+    		if (this.hasVillage()) {
+        		// find the nearest storage structure
+        		VillageStructure storage = this.getVillage().getNearestStructure(VillageStructureType.STORAGE, this.getPosition());
+        		if (storage != null) {
+            		// get distance to nearest storage structure
+            		double distanceTo = storage.getItemFrame().getDistance(this);
+            		// check if near the storage structure
+            		if (distanceTo > (Village.VILLAGE_SIZE / 2)) {
+            			// not close to storage, so move a little faster
+        				return (0.30F + this.getLevel() * 0.02F) * movementMode.speedMultiplier;
+        			}
+        		}
     		}
     	default:
     		break;
