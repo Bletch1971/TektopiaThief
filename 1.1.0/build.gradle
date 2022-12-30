@@ -27,12 +27,16 @@ minecraft {
     runDir = "run"
 }
 
-repositories {
+repositories {  
+    maven {
+        name = "CurseForge"
+        url = "https://www.cursemaven.com"
+    }
 }
 
 dependencies {
-    compile files('../../../../JavaWorkspaces/_craftstudio/CraftStudioAPI-1.0.0.93-mc1.12-alpha-dev.jar')
-	compile files('../../../../JavaWorkspaces/tektopia/Tektopia-1.12.2-1.1.0-deobf.jar')
+	deobfCompile("curse.maven:craftstudio-api-268704:${project.craftstudio_version_id}")
+	deobfCompile("curse.maven:tektopia-333029:${project.tektopia_version_id}")
 }
 
 //Creates a compiled de-obfuscated jar
@@ -70,7 +74,7 @@ processResources {
 sourceSets {
     main {
         java {
-            srcDir '../../../TektopiaCommon/src/main/java'
+            srcDir '../../TektopiaCommon/src/main/java'
         }
     }
 }
